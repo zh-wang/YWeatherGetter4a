@@ -15,6 +15,7 @@ public class MainActivity extends Activity {
         
         YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
         WeatherInfo weatherInfo = yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "Tokyo");
+
         if(weatherInfo != null) {
         	TextView tv = (TextView) findViewById(R.id.textview_weather_info);
 			tv.setText(weatherInfo.getTitle() + "\n"
@@ -24,7 +25,7 @@ public class MainActivity extends Activity {
 					+ "forecast weather: " + weatherInfo.getForecast1Text() + "\n" 
 					+ "forecast weather: " + weatherInfo.getForecast2Text());
         } 
-        
+      
     }
 
 }

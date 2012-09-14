@@ -66,7 +66,7 @@ public class WeatherInfo {
 		return mForecast1Date;
 	}
 
-	public void setForecast1Date(String forecast1Date) {
+	void setForecast1Date(String forecast1Date) {
 		mForecast1Date = forecast1Date;
 	}
 
@@ -74,7 +74,7 @@ public class WeatherInfo {
 		return mForecast2Date;
 	}
 
-	public void setForecast2Date(String forecast2Date) {
+	void setForecast2Date(String forecast2Date) {
 		mForecast2Date = forecast2Date;
 	}
 
@@ -82,7 +82,7 @@ public class WeatherInfo {
 		return mCurrentConditionDate;
 	}
 	
-	public void setCurrentConditionDate(String currentConditionDate) {
+	void setCurrentConditionDate(String currentConditionDate) {
 		mCurrentConditionDate = currentConditionDate;
 	}
 	
@@ -94,7 +94,7 @@ public class WeatherInfo {
 		return mCurrentCode;
 	}
 
-	public void setCurrentCode(int currentCode) {
+	void setCurrentCode(int currentCode) {
 		mCurrentCode = currentCode;
 		mCurrentConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + currentCode + ".gif";
 	}
@@ -103,7 +103,7 @@ public class WeatherInfo {
 		return mCurrentTempF;
 	}
 
-	public void setCurrentTempF(int currentTempF) {
+	void setCurrentTempF(int currentTempF) {
 		mCurrentTempF = currentTempF;
 		mCurrentTempC = this.turnFtoC(currentTempF);
 	}
@@ -112,7 +112,7 @@ public class WeatherInfo {
 		return mForecast1Day;
 	}
 
-	public void setForecast1Day(String forecast1Day) {
+	void setForecast1Day(String forecast1Day) {
 		mForecast1Day = forecast1Day;
 	}
 
@@ -120,7 +120,7 @@ public class WeatherInfo {
 		return mForecast1Code;
 	}
 
-	public void setForecast1Code(int forecast1Code) {
+	void setForecast1Code(int forecast1Code) {
 		mForecast1Code = forecast1Code;
 		mForecast1ConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + forecast1Code + ".gif";
 	}
@@ -129,7 +129,7 @@ public class WeatherInfo {
 		return mForecast1Text;
 	}
 
-	public void setForecast1Text(String forecast1Text) {
+	void setForecast1Text(String forecast1Text) {
 		mForecast1Text = forecast1Text;
 	}
 
@@ -137,7 +137,7 @@ public class WeatherInfo {
 		return mForecast1TempHighF;
 	}
 
-	public void setForecast1TempHighF(int forecast1TempHighF) {
+	void setForecast1TempHighF(int forecast1TempHighF) {
 		mForecast1TempHighF = forecast1TempHighF;
 		mForecast1TempHighC = this.turnFtoC(forecast1TempHighF);
 	}
@@ -146,7 +146,7 @@ public class WeatherInfo {
 		return mForecast1TempLowF;
 	}
 
-	public void setForecast1TempLowF(int forecast1TempLowF) {
+	void setForecast1TempLowF(int forecast1TempLowF) {
 		mForecast1TempLowF = forecast1TempLowF;
 		mForecast1TempLowC = this.turnFtoC(forecast1TempLowF);
 	}
@@ -155,7 +155,7 @@ public class WeatherInfo {
 		return mForecast2Day;
 	}
 
-	public void setForecast2Day(String forecast2Day) {
+	void setForecast2Day(String forecast2Day) {
 		mForecast2Day = forecast2Day;
 	}
 
@@ -163,7 +163,7 @@ public class WeatherInfo {
 		return mForecast2Code;
 	}
 
-	public void setForecast2Code(int forecast2Code) {
+	void setForecast2Code(int forecast2Code) {
 		mForecast2Code = forecast2Code;
 		mForecast2ConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + forecast2Code + ".gif";
 	}
@@ -184,7 +184,7 @@ public class WeatherInfo {
 		return mForecast2Text;
 	}
 
-	public void setForecast2Text(String forecast2Text) {
+	void setForecast2Text(String forecast2Text) {
 		mForecast2Text = forecast2Text;
 	}
 
@@ -192,7 +192,7 @@ public class WeatherInfo {
 		return mForecast2TempHighF;
 	}
 
-	public void setForecast2TempHighF(int forecast2TempHighF) {
+	void setForecast2TempHighF(int forecast2TempHighF) {
 		mForecast2TempHighF = forecast2TempHighF;
 		mForecast2TempHighC = this.turnFtoC(forecast2TempHighF);
 	}
@@ -201,7 +201,7 @@ public class WeatherInfo {
 		return mForecast2TempLowF;
 	}
 
-	public void setForecast2TempLowF(int forecast2TempLowF) {
+	void setForecast2TempLowF(int forecast2TempLowF) {
 		mForecast2TempLowF = forecast2TempLowF;
 		mForecast2TempLowC = this.turnFtoC(forecast2TempLowF);
 	}
@@ -230,7 +230,7 @@ public class WeatherInfo {
 		return mTitle;
 	}
 
-	public void setTitle(String title) {
+	void setTitle(String title) {
 		mTitle = title;
 	}
 
@@ -238,7 +238,7 @@ public class WeatherInfo {
 		return mDescription;
 	}
 
-	public void setDescription(String description) {
+	void setDescription(String description) {
 		mDescription = description;
 	}
 
@@ -246,7 +246,7 @@ public class WeatherInfo {
 		return mLanguage;
 	}
 
-	public void setLanguage(String language) {
+	void setLanguage(String language) {
 		mLanguage = language;
 	}
 
@@ -254,7 +254,7 @@ public class WeatherInfo {
 		return mLastBuildDate;
 	}
 
-	public void setLastBuildDate(String lastBuildDate) {
+	void setLastBuildDate(String lastBuildDate) {
 		mLastBuildDate = lastBuildDate;
 	}
 
@@ -262,7 +262,7 @@ public class WeatherInfo {
 		return mLocationCity;
 	}
 
-	public void setLocationCity(String locationCity) {
+	void setLocationCity(String locationCity) {
 		mLocationCity = locationCity;
 	}
 
@@ -270,7 +270,7 @@ public class WeatherInfo {
 		return mLocationRegion;
 	}
 
-	public void setLocationRegion(String locationRegion) {
+	void setLocationRegion(String locationRegion) {
 		mLocationRegion = locationRegion;
 	}
 
@@ -278,7 +278,7 @@ public class WeatherInfo {
 		return mLocationCountry;
 	}
 
-	public void setLocationCountry(String locationCountry) {
+	void setLocationCountry(String locationCountry) {
 		mLocationCountry = locationCountry;
 	}
 
@@ -286,7 +286,7 @@ public class WeatherInfo {
 		return mWindChill;
 	}
 
-	public void setWindChill(String windChill) {
+	void setWindChill(String windChill) {
 		mWindChill = windChill;
 	}
 
@@ -294,7 +294,7 @@ public class WeatherInfo {
 		return mWindDirection;
 	}
 
-	public void setWindDirection(String windDirection) {
+	void setWindDirection(String windDirection) {
 		mWindDirection = windDirection;
 	}
 
@@ -302,7 +302,7 @@ public class WeatherInfo {
 		return mWindSpeed;
 	}
 
-	public void setWindSpeed(String windSpeed) {
+	void setWindSpeed(String windSpeed) {
 		mWindSpeed = windSpeed;
 	}
 
@@ -310,7 +310,7 @@ public class WeatherInfo {
 		return mAtmosphereHumidity;
 	}
 
-	public void setAtmosphereHumidity(String atmosphereHumidity) {
+	void setAtmosphereHumidity(String atmosphereHumidity) {
 		mAtmosphereHumidity = atmosphereHumidity;
 	}
 
@@ -318,7 +318,7 @@ public class WeatherInfo {
 		return mAtmosphereVisibility;
 	}
 
-	public void setAtmosphereVisibility(String atmosphereVisibility) {
+	void setAtmosphereVisibility(String atmosphereVisibility) {
 		mAtmosphereVisibility = atmosphereVisibility;
 	}
 
@@ -326,7 +326,7 @@ public class WeatherInfo {
 		return mAtmospherePressure;
 	}
 
-	public void setAtmospherePressure(String atmospherePressure) {
+	void setAtmospherePressure(String atmospherePressure) {
 		mAtmospherePressure = atmospherePressure;
 	}
 
@@ -334,7 +334,7 @@ public class WeatherInfo {
 		return mAtmosphereRising;
 	}
 
-	public void setAtmosphereRising(String atmosphereRising) {
+	void setAtmosphereRising(String atmosphereRising) {
 		mAtmosphereRising = atmosphereRising;
 	}
 
@@ -342,7 +342,7 @@ public class WeatherInfo {
 		return mAstronomySunrise;
 	}
 
-	public void setAstronomySunrise(String astronomySunrise) {
+	void setAstronomySunrise(String astronomySunrise) {
 		mAstronomySunrise = astronomySunrise;
 	}
 
@@ -350,7 +350,7 @@ public class WeatherInfo {
 		return mAstronomySunset;
 	}
 
-	public void setAstronomySunset(String astronomySunset) {
+	void setAstronomySunset(String astronomySunset) {
 		mAstronomySunset = astronomySunset;
 	}
 
@@ -358,7 +358,7 @@ public class WeatherInfo {
 		return mConditionTitle;
 	}
 
-	public void setConditionTitle(String conditionTitle) {
+	void setConditionTitle(String conditionTitle) {
 		mConditionTitle = conditionTitle;
 	}
 
@@ -366,7 +366,7 @@ public class WeatherInfo {
 		return mConditionLat;
 	}
 
-	public void setConditionLat(String conditionLat) {
+	void setConditionLat(String conditionLat) {
 		mConditionLat = conditionLat;
 	}
 
@@ -374,7 +374,7 @@ public class WeatherInfo {
 		return mConditionLon;
 	}
 
-	public void setConditionLon(String conditionLon) {
+	void setConditionLon(String conditionLon) {
 		mConditionLon = conditionLon;
 	}
 
@@ -382,15 +382,15 @@ public class WeatherInfo {
 		return mCurrentText;
 	}
 
-	public void setCurrentText(String currentText) {
+	void setCurrentText(String currentText) {
 		mCurrentText = currentText;
 	}
 
-	public void setCurrentTempC(int currentTempC) {
+	void setCurrentTempC(int currentTempC) {
 		mCurrentTempC = currentTempC;
 	}
 
-	public void setCurrentConditionIconURL(String currentConditionIconURL) {
+	void setCurrentConditionIconURL(String currentConditionIconURL) {
 		mCurrentConditionIconURL = currentConditionIconURL;
 	}
 
