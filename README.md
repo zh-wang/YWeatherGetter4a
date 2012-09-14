@@ -3,6 +3,9 @@ YWeatherGetter4a
 
 An Yahoo Weather API wrapper for android
 
+It contains an exmaple project works on android 2.2 or above.
+Yahoo Weather API wrapper works on android 1.6 or above.
+
 1. What is this?
 This is a wrapper for getting weather information from Yahoo Weather API, for android.
 
