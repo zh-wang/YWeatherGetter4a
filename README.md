@@ -11,6 +11,8 @@ This is a wrapper for getting weather information from Yahoo Weather API, for an
 
 2. How do I use it?
 Add the following code to get weather information.
+Make sure you are not calling it in UI thread, or you'll get an exception in android 3.0 or above. :)
+Use an AsyncTask is recommanded. :)
 
 	YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
 	WeatherInfo weatherInfo = yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "Name of City or Area");
