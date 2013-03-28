@@ -38,6 +38,10 @@ public class YahooWeatherUtils {
 	public void queryYahooWeather(Context context, String cityName, YahooWeatherInfoListener result) {
 		mWeatherInfoResult = result;
 		WeatherQueryTask task = new WeatherQueryTask();
+<<<<<<< HEAD
+=======
+		task.setContext(context);
+>>>>>>> b34fdbe9a9a1a0e49c13eb8ad9ab029c93f2a05e
 		task.execute(new String[]{cityName});
 	}
 	
