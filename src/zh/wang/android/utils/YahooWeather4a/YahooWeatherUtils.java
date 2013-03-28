@@ -21,6 +21,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.widget.Toast;
 
 public class YahooWeatherUtils {
@@ -28,22 +29,16 @@ public class YahooWeatherUtils {
 	public static final String YAHOO_WEATHER_ERROR = "Yahoo! Weather - Error";
 	
 	private String woeidNumber;
+	private YahooWeatherInfoListener mWeatherInfoResult;
 
 	public static YahooWeatherUtils getInstance() {
 		return new YahooWeatherUtils();
 	}
 	
-	public WeatherInfo queryYahooWeather(Context context, String cityName) {
-		WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
-		woeidNumber = woeidUtils.getWOEIDid(context, cityName);
-		if(!woeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
-			String weatherString = getWeatherString(context, woeidNumber);
-			Document weatherDoc = convertStringToDocument(context, weatherString);
-			WeatherInfo weatherInfo = parseWeatherInfo(context, weatherDoc);
-			return weatherInfo;
-		} else {
-			return null;
-		}
+	public void queryYahooWeather(Context context, String cityName, YahooWeatherInfoListener result) {
+		mWeatherInfoResult = result;
+		WeatherQueryTask task = new WeatherQueryTask();
+		task.execute(new String[]{cityName});
 	}
 	
 	private String getWeatherString(Context context, String woeidNumber) {
@@ -212,4 +207,37 @@ public class YahooWeatherUtils {
 		
 		return weatherInfo;
 	}
+	
+	private class WeatherQueryTask extends AsyncTask<String, Void, WeatherInfo> {
+		
+		private Context mContext;
+		
+		public void setContext(Context context) {
+			mContext = context;
+		}
+
+		@Override
+		protected WeatherInfo doInBackground(String... cityName) {
+			// TODO Auto-generated method stub
+			WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
+			woeidNumber = woeidUtils.getWOEIDid(mContext, cityName[0]);
+			if(!woeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
+				String weatherString = getWeatherString(mContext, woeidNumber);
+				Document weatherDoc = convertStringToDocument(mContext, weatherString);
+				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
+				return weatherInfo;
+			} else {
+				return null;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(WeatherInfo result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			mWeatherInfoResult.gotWeatherInfo(result);
+		}
+		
+	}
+
 }

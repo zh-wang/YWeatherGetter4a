@@ -9,14 +9,16 @@ Yahoo Weather API wrapper works on android 1.6 or above.
 1. What is this?
 This is a wrapper for getting weather information from Yahoo Weather API, for android.
 
-2. How do I use it?
-Add the following code to get weather information.
+2. How do I use it? (Changed from 2013/03/23)
+
+i.   Implement YahooWeatherInfoListener in your Activity. Overwrite the callback function "gotWeatherInfo", which will be called after querying from Yahoo weather API.
+
+ii.  Use the following code to get weather information.
 
 	YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
-	WeatherInfo weatherInfo = yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "Name of City or Area");
+	yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "Name of City or Area", this);
 
 Replace "Name of City or Area" to what you want.
-Information retrieved from Yahoo Weather API is stored in weatherInfo.
 
 3. What kind of weather information can I get?
 You can get current condition of weather, humidity, wind, etc.
