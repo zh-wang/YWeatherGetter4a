@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,8 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        Log.d("YWeatherGetter4a", "onCreate");
         
         YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
         yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "tokyo", this);
