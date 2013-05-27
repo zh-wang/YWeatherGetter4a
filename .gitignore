@@ -16,3 +16,6 @@ gen/
 *.jar
 *.war
 *.ear
+
+# Release Files #
+release/
