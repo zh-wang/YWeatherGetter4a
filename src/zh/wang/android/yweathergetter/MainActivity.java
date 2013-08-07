@@ -18,14 +18,22 @@
 package zh.wang.android.yweathergetter;
 
 import zh.wang.android.tools.ImageUtils;
+import zh.wang.android.tools.NetworkUtils;
 import zh.wang.android.utils.YahooWeather4a.WeatherInfo;
+import zh.wang.android.utils.YahooWeather4a.WeatherInfo.ForecastInfo;
 import zh.wang.android.utils.YahooWeather4a.YahooWeatherInfoListener;
 import zh.wang.android.utils.YahooWeather4a.YahooWeatherUtils;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,16 +46,41 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	private TextView tvWeather0;
 	private TextView tvWeather1;
 	private TextView tvWeather2;
+	private EditText etAreaOfCity;
+	private Button btSearch;
+	private YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        if (!NetworkUtils.isConnected(getApplicationContext())) {
+        	Toast.makeText(getApplicationContext(), "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
+        	return;
+        }
+        
         Log.d("YWeatherGetter4a", "onCreate");
         
-        YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
         yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "tokyo", this);
+        
+        etAreaOfCity = (EditText) findViewById(R.id.edittext_area);
+        etAreaOfCity.setText("tokyo");
+        
+        btSearch = (Button) findViewById(R.id.search_button);
+        btSearch.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String areaOrCity = etAreaOfCity.getText().toString();
+				if (!TextUtils.isEmpty(areaOrCity)) {
+					yahooWeatherUtils.queryYahooWeather(getApplicationContext(), areaOrCity, MainActivity.this);
+					InputMethodManager imm = (InputMethodManager)getSystemService(
+	              	      Context.INPUT_METHOD_SERVICE);
+	              	imm.hideSoftInputFromWindow(etAreaOfCity.getWindowToken(), 0);
+				}
+			}
+		});
+     
     }
 
 	@Override
@@ -72,22 +105,23 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 					           "Visibility: " + weatherInfo.getAtmosphereVisibility()
 					           );
 			tvWeather1 = (TextView) findViewById(R.id.textview_weather_info_1);
+			final ForecastInfo forecastInfo = weatherInfo.getForecastInfo1();
 			tvWeather1.setText("====== FORECAST 1 ======" + "\n" +
-			                   "date: " + weatherInfo.getForecast1Date() + "\n" +
-			                   "weather: " + weatherInfo.getForecast1Text() + "\n" +
-					           "low  temperature in ºC: " + weatherInfo.getForecast1TempLowC() + "\n" +
-			                   "high temperature in ºC: " + weatherInfo.getForecast1TempHighC() + "\n" +
-					           "low  temperature in ºF: " + weatherInfo.getForecast1TempLowF() + "\n" +
-			                   "high temperature in ºF: " + weatherInfo.getForecast1TempHighF() + "\n"
+			                   "date: " + forecastInfo.getForecastDate() + "\n" +
+			                   "weather: " + forecastInfo.getForecastText() + "\n" +
+					           "low  temperature in ºC: " + forecastInfo.getForecastTempLowC() + "\n" +
+			                   "high temperature in ºC: " + forecastInfo.getForecastTempHighC() + "\n" +
+					           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
+			                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
 					           );
 			tvWeather2 = (TextView) findViewById(R.id.textview_weather_info_2);
 			tvWeather2.setText("====== FORECAST 2 ======" + "\n" +
-					   "date: " + weatherInfo.getForecast1Date() + "\n" +
-	                   "weather: " + weatherInfo.getForecast2Text() + "\n" +
-			           "low  temperature in ºC: " + weatherInfo.getForecast2TempLowC() + "\n" +
-	                   "high temperature in ºC: " + weatherInfo.getForecast2TempHighC() + "\n" +
-			           "low  temperature in ºF: " + weatherInfo.getForecast2TempLowF() + "\n" +
-	                   "high temperature in ºF: " + weatherInfo.getForecast2TempHighF() + "\n"
+					   "date: " + forecastInfo.getForecastDate() + "\n" +
+	                   "weather: " + forecastInfo.getForecastText() + "\n" +
+			           "low  temperature in ºC: " + forecastInfo.getForecastTempLowC() + "\n" +
+	                   "high temperature in ºC: " + forecastInfo.getForecastTempHighC() + "\n" +
+			           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
+	                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
 			           );
 			
 			ivWeather0 = (ImageView) findViewById(R.id.imageview_weather_info_0);
@@ -97,8 +131,8 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 			LoadWebImagesTask task = new LoadWebImagesTask();
 			task.execute(
 					weatherInfo.getCurrentConditionIconURL(), 
-					weatherInfo.getForecast1ConditionIconURL(),
-					weatherInfo.getForecast2ConditionIconURL()
+					weatherInfo.getForecastInfo1().getForecastConditionIconURL(),
+					weatherInfo.getForecastInfo2().getForecastConditionIconURL()
 					);
         } else {
         	Toast.makeText(getApplicationContext(), "Sorry, no result returned", Toast.LENGTH_SHORT).show();

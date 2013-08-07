@@ -56,43 +56,28 @@ public class WeatherInfo {
 	/*
 	 * information in the first tag "yweather:forecast"
 	 */
-	String mForecast1Day;
-	String mForecast1Date;
-	int mForecast1Code;
-	String mForecast1Text;
-	int mForecast1TempHighC;
-	int mForecast1TempLowC;
-	int mForecast1TempHighF;
-	int mForecast1TempLowF;
-	String mForecast1ConditionIconURL;
 
 	/*
 	 * information in the second tag "yweather:forecast"
 	 */
-	String mForecast2Day;
-	String mForecast2Date;
-	int mForecast2Code;
-	String mForecast2Text;
-	int mForecast2TempHighC;
-	int mForecast2TempLowC;
-	int mForecast2TempHighF;
-	int mForecast2TempLowF;
-	String mForecast2ConditionIconURL;
 	
-	public String getForecast1Date() {
-		return mForecast1Date;
+	ForecastInfo mForecastInfo1 = new ForecastInfo();
+	ForecastInfo mForecastInfo2 = new ForecastInfo();
+	
+	public ForecastInfo getForecastInfo1() {
+		return mForecastInfo1;
 	}
 
-	void setForecast1Date(String forecast1Date) {
-		mForecast1Date = forecast1Date;
+	public void setForecastInfo1(ForecastInfo forecastInfo1) {
+		mForecastInfo1 = forecastInfo1;
 	}
 
-	public String getForecast2Date() {
-		return mForecast2Date;
+	public ForecastInfo getForecastInfo2() {
+		return mForecastInfo2;
 	}
 
-	void setForecast2Date(String forecast2Date) {
-		mForecast2Date = forecast2Date;
+	public void setForecastInfo2(ForecastInfo forecastInfo2) {
+		mForecastInfo2 = forecastInfo2;
 	}
 
 	public String getCurrentConditionDate() {
@@ -125,124 +110,14 @@ public class WeatherInfo {
 		mCurrentTempC = this.turnFtoC(currentTempF);
 	}
 
-	public String getForecast1Day() {
-		return mForecast1Day;
-	}
-
-	void setForecast1Day(String forecast1Day) {
-		mForecast1Day = forecast1Day;
-	}
-
-	public int getForecast1Code() {
-		return mForecast1Code;
-	}
-
-	void setForecast1Code(int forecast1Code) {
-		mForecast1Code = forecast1Code;
-		mForecast1ConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + forecast1Code + ".gif";
-	}
-
-	public String getForecast1Text() {
-		return mForecast1Text;
-	}
-
-	void setForecast1Text(String forecast1Text) {
-		mForecast1Text = forecast1Text;
-	}
-
-	public int getForecast1TempHighF() {
-		return mForecast1TempHighF;
-	}
-
-	void setForecast1TempHighF(int forecast1TempHighF) {
-		mForecast1TempHighF = forecast1TempHighF;
-		mForecast1TempHighC = this.turnFtoC(forecast1TempHighF);
-	}
-
-	public int getForecast1TempLowF() {
-		return mForecast1TempLowF;
-	}
-
-	void setForecast1TempLowF(int forecast1TempLowF) {
-		mForecast1TempLowF = forecast1TempLowF;
-		mForecast1TempLowC = this.turnFtoC(forecast1TempLowF);
-	}
-
-	public String getForecast2Day() {
-		return mForecast2Day;
-	}
-
-	void setForecast2Day(String forecast2Day) {
-		mForecast2Day = forecast2Day;
-	}
-
-	public int getForecast2Code() {
-		return mForecast2Code;
-	}
-
-	void setForecast2Code(int forecast2Code) {
-		mForecast2Code = forecast2Code;
-		mForecast2ConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + forecast2Code + ".gif";
-	}
-
 	public String getCurrentConditionIconURL() {
 		return mCurrentConditionIconURL;
-	}
-
-	public String getForecast1ConditionIconURL() {
-		return mForecast1ConditionIconURL;
-	}
-
-	public String getForecast2ConditionIconURL() {
-		return mForecast2ConditionIconURL;
-	}
-
-	public String getForecast2Text() {
-		return mForecast2Text;
-	}
-
-	void setForecast2Text(String forecast2Text) {
-		mForecast2Text = forecast2Text;
-	}
-
-	public int getForecast2TempHighF() {
-		return mForecast2TempHighF;
-	}
-
-	void setForecast2TempHighF(int forecast2TempHighF) {
-		mForecast2TempHighF = forecast2TempHighF;
-		mForecast2TempHighC = this.turnFtoC(forecast2TempHighF);
-	}
-
-	public int getForecast2TempLowF() {
-		return mForecast2TempLowF;
-	}
-
-	void setForecast2TempLowF(int forecast2TempLowF) {
-		mForecast2TempLowF = forecast2TempLowF;
-		mForecast2TempLowC = this.turnFtoC(forecast2TempLowF);
 	}
 
 	public int getCurrentTempC() {
 		return mCurrentTempC;
 	}
 
-	public int getForecast1TempHighC() {
-		return mForecast1TempHighC;
-	}
-
-	public int getForecast1TempLowC() {
-		return mForecast1TempLowC;
-	}
-
-	public int getForecast2TempHighC() {
-		return mForecast2TempHighC;
-	}
-
-	public int getForecast2TempLowC() {
-		return mForecast2TempLowC;
-	}
-	
 	public String getTitle() {
 		return mTitle;
 	}
@@ -411,5 +286,91 @@ public class WeatherInfo {
 		mCurrentConditionIconURL = currentConditionIconURL;
 	}
 
+	public class ForecastInfo {
+		private String mForecastDay;
+		private String mForecastDate;
+		private int mForecastCode;
+		private int mForecastTempHighC;
+		private int mForecastTempLowC;
+		private int mForecastTempHighF;
+		private int mForecastTempLowF;
+		private String mForecastConditionIconURL;
+		private String mForecastText;
 
+		public String getForecastDay() {
+			return mForecastDay;
+		}
+
+		public void setForecastDay(String forecastDay) {
+			mForecastDay = forecastDay;
+		}
+
+		public String getForecastDate() {
+			return mForecastDate;
+		}
+
+		public void setForecastDate(String forecastDate) {
+			mForecastDate = forecastDate;
+		}
+
+		public int getForecastCode() {
+			return mForecastCode;
+		}
+
+		public void setForecastCode(int forecastCode) {
+			mForecastCode = forecastCode;
+			mForecastConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + forecastCode + ".gif";
+		}
+
+		public int getForecastTempHighC() {
+			return mForecastTempHighC;
+		}
+
+		public void setForecastTempHighC(int forecastTempHighC) {
+			mForecastTempHighC = forecastTempHighC;
+		}
+
+		public int getForecastTempLowC() {
+			return mForecastTempLowC;
+		}
+
+		public void setForecastTempLowC(int forecastTempLowC) {
+			mForecastTempLowC = forecastTempLowC;
+		}
+
+		public int getForecastTempHighF() {
+			return mForecastTempHighF;
+		}
+
+		public void setForecastTempHighF(int forecastTempHighF) {
+			mForecastTempHighF = forecastTempHighF;
+			mForecastTempHighC = turnFtoC(forecastTempHighF);
+		}
+
+		public int getForecastTempLowF() {
+			return mForecastTempLowF;
+		}
+
+		public void setForecastTempLowF(int forecastTempLowF) {
+			mForecastTempLowF = forecastTempLowF;
+			mForecastTempLowC = turnFtoC(forecastTempLowF);
+		}
+
+		public String getForecastConditionIconURL() {
+			return mForecastConditionIconURL;
+		}
+
+		public void setForecastConditionIconURL(String forecastConditionIconURL) {
+			mForecastConditionIconURL = forecastConditionIconURL;
+		}
+
+		public String getForecastText() {
+			return mForecastText;
+		}
+
+		public void setForecastText(String forecastText) {
+			mForecastText = forecastText;
+		}
+		
+	}
 }

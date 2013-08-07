@@ -12,12 +12,13 @@
     </uses-permission>
 
     <application
+        android:allowBackup="false"
         android:icon="@drawable/appicon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" android:enabled="false">
         
-        <activity
-            android:name=".MainActivity"
+        <activity  android:windowSoftInputMode="stateHidden"
+            android:name="zh.wang.android.yweathergetter.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -37,6 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import zh.wang.android.utils.YahooWeather4a.WeatherInfo.ForecastInfo;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -157,9 +159,6 @@ public class YahooWeatherUtils {
 			weatherInfo.setConditionLat(doc.getElementsByTagName("geo:lat").item(0).getTextContent());
 			weatherInfo.setConditionLon(doc.getElementsByTagName("geo:long").item(0).getTextContent());
 			
-			
-			
-			
 			Node currentConditionNode = doc.getElementsByTagName("yweather:condition").item(0);
 			weatherInfo.setCurrentCode(
 					Integer.parseInt(
@@ -174,48 +173,8 @@ public class YahooWeatherUtils {
 			weatherInfo.setCurrentConditionDate(
 					currentConditionNode.getAttributes().getNamedItem("date").getNodeValue());
 			
-			Node forecast1ConditionNode = doc.getElementsByTagName("yweather:forecast").item(0);
-			weatherInfo.setForecast1Code(
-					Integer.parseInt(
-							forecast1ConditionNode.getAttributes().getNamedItem("code").getNodeValue()
-							));
-			weatherInfo.setForecast1Text(
-					forecast1ConditionNode.getAttributes().getNamedItem("text").getNodeValue());
-			weatherInfo.setForecast1Date(
-					forecast1ConditionNode.getAttributes().getNamedItem("date").getNodeValue());
-			weatherInfo.setForecast1Day(
-					forecast1ConditionNode.getAttributes().getNamedItem("day").getNodeValue());
-			weatherInfo.setForecast1TempHighF(
-					Integer.parseInt(
-							forecast1ConditionNode.getAttributes().getNamedItem("high").getNodeValue()
-							));
-			weatherInfo.setForecast1TempLowF(
-					Integer.parseInt(
-							forecast1ConditionNode.getAttributes().getNamedItem("low").getNodeValue()
-							));
-			
-			
-			
-			Node forecast2ConditionNode = doc.getElementsByTagName("yweather:forecast").item(1);
-			weatherInfo.setForecast2Code(
-					Integer.parseInt(
-							forecast2ConditionNode.getAttributes().getNamedItem("code").getNodeValue()
-							));
-			weatherInfo.setForecast2Text(
-					forecast2ConditionNode.getAttributes().getNamedItem("text").getNodeValue());
-			weatherInfo.setForecast2Date(
-					forecast2ConditionNode.getAttributes().getNamedItem("date").getNodeValue());
-			weatherInfo.setForecast2Day(
-					forecast2ConditionNode.getAttributes().getNamedItem("day").getNodeValue());
-			weatherInfo.setForecast2TempHighF(
-					Integer.parseInt(
-							forecast2ConditionNode.getAttributes().getNamedItem("high").getNodeValue()
-							));
-			weatherInfo.setForecast2TempLowF(
-					Integer.parseInt(
-							forecast2ConditionNode.getAttributes().getNamedItem("low").getNodeValue()
-							));
-			
+			this.parseForecastInfo(weatherInfo.getForecastInfo1(), doc, 0);
+			this.parseForecastInfo(weatherInfo.getForecastInfo2(), doc, 1);
 			
 		} catch (NullPointerException e) {
 			e.printStackTrace();
@@ -224,6 +183,27 @@ public class YahooWeatherUtils {
 		}
 		
 		return weatherInfo;
+	}
+	
+	private void parseForecastInfo(final ForecastInfo forecastInfo, final Document doc, final int pIndex) {
+		Node forecast1ConditionNode = doc.getElementsByTagName("yweather:forecast").item(pIndex);
+		forecastInfo.setForecastCode(Integer.parseInt(
+				forecast1ConditionNode.getAttributes().getNamedItem("code").getNodeValue()
+				));
+		forecastInfo.setForecastText(
+				forecast1ConditionNode.getAttributes().getNamedItem("text").getNodeValue());
+		forecastInfo.setForecastDate(
+				forecast1ConditionNode.getAttributes().getNamedItem("date").getNodeValue());
+		forecastInfo.setForecastDay(
+				forecast1ConditionNode.getAttributes().getNamedItem("day").getNodeValue());
+		forecastInfo.setForecastTempHighF(
+				Integer.parseInt(
+						forecast1ConditionNode.getAttributes().getNamedItem("high").getNodeValue()
+						));
+		forecastInfo.setForecastTempLowF(
+				Integer.parseInt(
+						forecast1ConditionNode.getAttributes().getNamedItem("low").getNodeValue()
+						));
 	}
 	
 	private class WeatherQueryTask extends AsyncTask<String, Void, WeatherInfo> {
