@@ -17,12 +17,14 @@
 
 package zh.wang.android.yweathergetter;
 
+import zh.wang.android.tools.AsciiUtils;
 import zh.wang.android.tools.ImageUtils;
 import zh.wang.android.tools.NetworkUtils;
 import zh.wang.android.utils.YahooWeather4a.WeatherInfo;
 import zh.wang.android.utils.YahooWeather4a.WeatherInfo.ForecastInfo;
 import zh.wang.android.utils.YahooWeather4a.YahooWeatherInfoListener;
 import zh.wang.android.utils.YahooWeather4a.YahooWeatherUtils;
+import zh.wang.android.yweathergetter.R;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -46,9 +48,12 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	private TextView tvWeather0;
 	private TextView tvWeather1;
 	private TextView tvWeather2;
+	private TextView tvErrorMessage;
+	private TextView tvTitle;
 	private EditText etAreaOfCity;
 	private Button btSearch;
 	private YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
+    private String location = "Shanghai China";
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,18 +67,29 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
         
         Log.d("YWeatherGetter4a", "onCreate");
         
-        yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "tokyo", this);
+    	tvTitle = (TextView) findViewById(R.id.textview_title);
+		tvWeather0 = (TextView) findViewById(R.id.textview_weather_info_0);
+		tvWeather1 = (TextView) findViewById(R.id.textview_weather_info_1);
+		tvWeather2 = (TextView) findViewById(R.id.textview_weather_info_2);
+		tvErrorMessage = (TextView) findViewById(R.id.textview_error_message);
+		ivWeather0 = (ImageView) findViewById(R.id.imageview_weather_info_0);
+		ivWeather1 = (ImageView) findViewById(R.id.imageview_weather_info_1);
+		ivWeather2 = (ImageView) findViewById(R.id.imageview_weather_info_2);
+        
+        String convertedlocation = AsciiUtils.convertNonAscii(location);
+        yahooWeatherUtils.queryYahooWeather(getApplicationContext(), convertedlocation, this);
         
         etAreaOfCity = (EditText) findViewById(R.id.edittext_area);
-        etAreaOfCity.setText("tokyo");
+        etAreaOfCity.setText(location);
         
         btSearch = (Button) findViewById(R.id.search_button);
         btSearch.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String areaOrCity = etAreaOfCity.getText().toString();
-				if (!TextUtils.isEmpty(areaOrCity)) {
-					yahooWeatherUtils.queryYahooWeather(getApplicationContext(), areaOrCity, MainActivity.this);
+				String _location = etAreaOfCity.getText().toString();
+				if (!TextUtils.isEmpty(_location)) {
+					String _convertedLocation = AsciiUtils.convertNonAscii(_location);
+					yahooWeatherUtils.queryYahooWeather(getApplicationContext(), _convertedLocation, MainActivity.this);
 					InputMethodManager imm = (InputMethodManager)getSystemService(
 	              	      Context.INPUT_METHOD_SERVICE);
 	              	imm.hideSoftInputFromWindow(etAreaOfCity.getWindowToken(), 0);
@@ -87,11 +103,10 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	public void gotWeatherInfo(WeatherInfo weatherInfo) {
 		// TODO Auto-generated method stub
         if(weatherInfo != null) {
-        	TextView tv = (TextView) findViewById(R.id.textview_title);
-			tv.setText(weatherInfo.getTitle() + "\n"
+        	setNormalLayout();
+			tvTitle.setText(weatherInfo.getTitle() + "\n"
 					+ weatherInfo.getLocationCity() + ", "
 					+ weatherInfo.getLocationCountry());
-			tvWeather0 = (TextView) findViewById(R.id.textview_weather_info_0);
 			tvWeather0.setText("====== CURRENT ======" + "\n" +
 					           "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
 							   "weather: " + weatherInfo.getCurrentText() + "\n" +
@@ -104,7 +119,6 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 						       "Pressure: " + weatherInfo.getAtmospherePressure() + "\n" +
 					           "Visibility: " + weatherInfo.getAtmosphereVisibility()
 					           );
-			tvWeather1 = (TextView) findViewById(R.id.textview_weather_info_1);
 			final ForecastInfo forecastInfo = weatherInfo.getForecastInfo1();
 			tvWeather1.setText("====== FORECAST 1 ======" + "\n" +
 			                   "date: " + forecastInfo.getForecastDate() + "\n" +
@@ -114,7 +128,6 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 					           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
 			                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
 					           );
-			tvWeather2 = (TextView) findViewById(R.id.textview_weather_info_2);
 			tvWeather2.setText("====== FORECAST 2 ======" + "\n" +
 					   "date: " + forecastInfo.getForecastDate() + "\n" +
 	                   "weather: " + forecastInfo.getForecastText() + "\n" +
@@ -124,10 +137,6 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
 			           );
 			
-			ivWeather0 = (ImageView) findViewById(R.id.imageview_weather_info_0);
-			ivWeather1 = (ImageView) findViewById(R.id.imageview_weather_info_1);
-			ivWeather2 = (ImageView) findViewById(R.id.imageview_weather_info_2);
-			
 			LoadWebImagesTask task = new LoadWebImagesTask();
 			task.execute(
 					weatherInfo.getCurrentConditionIconURL(), 
@@ -135,8 +144,31 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 					weatherInfo.getForecastInfo2().getForecastConditionIconURL()
 					);
         } else {
-        	Toast.makeText(getApplicationContext(), "Sorry, no result returned", Toast.LENGTH_SHORT).show();
+        	setNoResultLayout();
         }
+	}
+	
+	private void setNormalLayout() {
+		ivWeather0.setVisibility(View.VISIBLE);
+		ivWeather1.setVisibility(View.VISIBLE);
+		ivWeather2.setVisibility(View.VISIBLE);
+		tvWeather0.setVisibility(View.VISIBLE);
+		tvWeather1.setVisibility(View.VISIBLE);
+		tvWeather2.setVisibility(View.VISIBLE);
+		tvTitle.setVisibility(View.VISIBLE);
+		tvErrorMessage.setVisibility(View.INVISIBLE);
+	}
+	
+	private void setNoResultLayout() {
+		ivWeather0.setVisibility(View.INVISIBLE);
+		ivWeather1.setVisibility(View.INVISIBLE);
+		ivWeather2.setVisibility(View.INVISIBLE);
+		tvWeather0.setVisibility(View.INVISIBLE);
+		tvWeather1.setVisibility(View.INVISIBLE);
+		tvWeather2.setVisibility(View.INVISIBLE);
+		tvTitle.setVisibility(View.INVISIBLE);
+		tvErrorMessage.setVisibility(View.VISIBLE);
+		tvErrorMessage.setText("Sorry, no result returned");
 	}
 	
 	class LoadWebImagesTask extends AsyncTask<String, Void, Bitmap[]> {

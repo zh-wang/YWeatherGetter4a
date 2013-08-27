@@ -11,34 +11,37 @@ Yahoo Weather API wrapper works on android 1.6 or above.
 Sample app can be found on Google Play. 	
 https://play.google.com/store/apps/details?id=zh.wang.android.yweathergetter
 
-+  What is this?	
-This is a wrapper for getting weather information from Yahoo Weather API, for android.
++  What is this?	 
 
-+ How do I use it? (Changed from 2013/03/23)	
+  This is a wrapper for getting weather information from Yahoo Weather API, for android.
 
-First, implement YahooWeatherInfoListener in your Activity. Overwrite the callback function "gotWeatherInfo", which will be called after querying from Yahoo weather API.
++ How do I use it? 
 	
-	@Override
-	public void gotWeatherInfo(WeatherInfo weatherInfo) {
-	        if(weatherInfo != null) {
-	        	// Add your code here
+   * First, implement YahooWeatherInfoListener in your Activity. Overwrite the callback function "gotWeatherInfo", which will be called after querying from Yahoo weather API.
+              
+		 @Override
+		 public void gotWeatherInfo(WeatherInfo weathe{
+			 if(weatherInfo != null) {
+	       	  // Add your code here
 	        }
-	}
+		 }
 
-Second, use the following code to get weather information.
+  * Second, use following code to assign the location where you want to get weather information at. Or you can input the location in app's top search bar.
 
-	YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
-	yahooWeatherUtils.queryYahooWeather(getApplicationContext(), "Name of City or Area", this);
+	    private String location = "Acaraù Brazil";
 
-Replace "Name of City or Area" to what you want.
+    Replace "Name of City or Area" to what you want.
+For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.
 
 
 + What kind of weather information can I get?	
-You can get current condition of weather, humidity, wind, etc.
-And some forecast information for next two days.
+  You can get 
+  * current condition of weather, humidity, wind, etc.
+  * forecast information for next two days.
 
-Check the XML structure returned by Yahoo Weather API here.
-http://weather.yahooapis.com/forecastrss?w=2459115
+  Check the XML structure returned by Yahoo Weather API here.
+  http://weather.yahooapis.com/forecastrss?w=2459115
+  
 
 Developed By
 ================
