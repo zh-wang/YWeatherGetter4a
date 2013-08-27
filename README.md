@@ -18,20 +18,23 @@ https://play.google.com/store/apps/details?id=zh.wang.android.yweathergetter
 + How do I use it? 
 	
    * First, implement YahooWeatherInfoListener in your Activity. Overwrite the callback function "gotWeatherInfo", which will be called after querying from Yahoo weather API.
-              
-		 @Override
-		 public void gotWeatherInfo(WeatherInfo weathe{
-			 if(weatherInfo != null) {
-	       	  // Add your code here
-	        }
-		 }
+	
+	```java
+	@Override
+	public void gotWeatherInfo(WeatherInfo weathe{
+		if(weatherInfo != null) {
+			// Add your code here
+		}
+	}
+	```
 
   * Second, use following code to assign the location where you want to get weather information at. Or you can input the location in app's top search bar.
+	
+	```java
+	private String location = "Tokyo Japan";
+	```
 
-	    private String location = "Acaraù Brazil";
-
-    Replace "Name of City or Area" to what you want.
-For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.
+    Replace "Name of City or Area" to what you want. For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.
 
 
 + What kind of weather information can I get?	
