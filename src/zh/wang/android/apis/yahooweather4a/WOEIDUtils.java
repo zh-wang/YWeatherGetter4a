@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package zh.wang.android.utils.YahooWeather4a;
+package zh.wang.android.apis.yahooweather4a;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

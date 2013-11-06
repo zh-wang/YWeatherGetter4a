@@ -17,97 +17,107 @@
 
 package zh.wang.android.yweathergetter;
 
-import zh.wang.android.tools.AsciiUtils;
-import zh.wang.android.tools.ImageUtils;
-import zh.wang.android.tools.NetworkUtils;
-import zh.wang.android.utils.YahooWeather4a.WeatherInfo;
-import zh.wang.android.utils.YahooWeather4a.WeatherInfo.ForecastInfo;
-import zh.wang.android.utils.YahooWeather4a.YahooWeatherInfoListener;
-import zh.wang.android.utils.YahooWeather4a.YahooWeatherUtils;
-import zh.wang.android.yweathergetter.R;
+import zh.wang.android.apis.yahooweather4a.AsciiUtils;
+import zh.wang.android.apis.yahooweather4a.WeatherInfo;
+import zh.wang.android.apis.yahooweather4a.WeatherInfo.ForecastInfo;
+import zh.wang.android.apis.yahooweather4a.YahooWeather;
+import zh.wang.android.apis.yahooweather4a.YahooWeatherInfoListener;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements YahooWeatherInfoListener {
 
-	private ImageView ivWeather0;
-	private ImageView ivWeather1;
-	private ImageView ivWeather2;
-	private TextView tvWeather0;
-	private TextView tvWeather1;
-	private TextView tvWeather2;
-	private TextView tvErrorMessage;
-	private TextView tvTitle;
-	private EditText etAreaOfCity;
-	private Button btSearch;
-	private YahooWeatherUtils yahooWeatherUtils = YahooWeatherUtils.getInstance();
-    private String location = "Shanghai China";
+	private ImageView mIvWeather0;
+	private TextView mTvWeather0;
+	private TextView mTvErrorMessage;
+	private TextView mTvTitle;
+	private EditText mEtAreaOfCity;
+	private Button mBtSearch;
+	private LinearLayout mWeatherInfosLayout;
+	private YahooWeather mYahooWeather = YahooWeather.getInstance();
+    private String mLocation = "Shanghai China";
+    
+    private ProgressDialog mProgressDialog;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        if (!NetworkUtils.isConnected(getApplicationContext())) {
-        	Toast.makeText(getApplicationContext(), "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
-        	return;
-        }
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.show();
         
-        Log.d("YWeatherGetter4a", "onCreate");
+    	mTvTitle = (TextView) findViewById(R.id.textview_title);
+		mTvWeather0 = (TextView) findViewById(R.id.textview_weather_info_0);
+		mTvErrorMessage = (TextView) findViewById(R.id.textview_error_message);
+		mIvWeather0 = (ImageView) findViewById(R.id.imageview_weather_info_0);
         
-    	tvTitle = (TextView) findViewById(R.id.textview_title);
-		tvWeather0 = (TextView) findViewById(R.id.textview_weather_info_0);
-		tvWeather1 = (TextView) findViewById(R.id.textview_weather_info_1);
-		tvWeather2 = (TextView) findViewById(R.id.textview_weather_info_2);
-		tvErrorMessage = (TextView) findViewById(R.id.textview_error_message);
-		ivWeather0 = (ImageView) findViewById(R.id.imageview_weather_info_0);
-		ivWeather1 = (ImageView) findViewById(R.id.imageview_weather_info_1);
-		ivWeather2 = (ImageView) findViewById(R.id.imageview_weather_info_2);
+		mYahooWeather.setNeedDownloadIcons(true);
+        mYahooWeather.queryYahooWeather(getApplicationContext(), mLocation, this);
         
-        String convertedlocation = AsciiUtils.convertNonAscii(location);
-        yahooWeatherUtils.queryYahooWeather(getApplicationContext(), convertedlocation, this);
+        mEtAreaOfCity = (EditText) findViewById(R.id.edittext_area);
+        mEtAreaOfCity.setText(mLocation);
         
-        etAreaOfCity = (EditText) findViewById(R.id.edittext_area);
-        etAreaOfCity.setText(location);
-        
-        btSearch = (Button) findViewById(R.id.search_button);
-        btSearch.setOnClickListener(new View.OnClickListener() {
+        mBtSearch = (Button) findViewById(R.id.search_button);
+        mBtSearch.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String _location = etAreaOfCity.getText().toString();
+				String _location = mEtAreaOfCity.getText().toString();
 				if (!TextUtils.isEmpty(_location)) {
 					String _convertedLocation = AsciiUtils.convertNonAscii(_location);
-					yahooWeatherUtils.queryYahooWeather(getApplicationContext(), _convertedLocation, MainActivity.this);
+					mYahooWeather.queryYahooWeather(getApplicationContext(), _convertedLocation, MainActivity.this);
 					InputMethodManager imm = (InputMethodManager)getSystemService(
 	              	      Context.INPUT_METHOD_SERVICE);
-	              	imm.hideSoftInputFromWindow(etAreaOfCity.getWindowToken(), 0);
+	              	imm.hideSoftInputFromWindow(mEtAreaOfCity.getWindowToken(), 0);
+
+	              	if (mProgressDialog != null && mProgressDialog.isShowing()) {
+	              		mProgressDialog.cancel();
+	              	}
+			        mProgressDialog = new ProgressDialog(MainActivity.this);
+			        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			        mProgressDialog.show();
 				}
 			}
 		});
+        
+        mWeatherInfosLayout = (LinearLayout) findViewById(R.id.weather_infos);
      
     }
+    
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		if (mProgressDialog != null && mProgressDialog.isShowing()) {
+			mProgressDialog.cancel();
+			mProgressDialog = null;
+		}
+		super.onDestroy();
+	}
 
 	@Override
 	public void gotWeatherInfo(WeatherInfo weatherInfo) {
 		// TODO Auto-generated method stub
-        if(weatherInfo != null) {
+		if (mProgressDialog != null && mProgressDialog.isShowing()) {
+			mProgressDialog.cancel();
+		}
+        if (weatherInfo != null) {
         	setNormalLayout();
-			tvTitle.setText(weatherInfo.getTitle() + "\n"
+        	mWeatherInfosLayout.removeAllViews();
+			mTvTitle.setText(weatherInfo.getTitle() + "\n"
 					+ weatherInfo.getLocationCity() + ", "
 					+ weatherInfo.getLocationCountry());
-			tvWeather0.setText("====== CURRENT ======" + "\n" +
+			mTvWeather0.setText("====== CURRENT ======" + "\n" +
 					           "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
 							   "weather: " + weatherInfo.getCurrentText() + "\n" +
 						       "temperature in ºC: " + weatherInfo.getCurrentTempC() + "\n" +
@@ -119,79 +129,44 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 						       "Pressure: " + weatherInfo.getAtmospherePressure() + "\n" +
 					           "Visibility: " + weatherInfo.getAtmosphereVisibility()
 					           );
-			final ForecastInfo forecastInfo = weatherInfo.getForecastInfo1();
-			tvWeather1.setText("====== FORECAST 1 ======" + "\n" +
-			                   "date: " + forecastInfo.getForecastDate() + "\n" +
-			                   "weather: " + forecastInfo.getForecastText() + "\n" +
-					           "low  temperature in ºC: " + forecastInfo.getForecastTempLowC() + "\n" +
-			                   "high temperature in ºC: " + forecastInfo.getForecastTempHighC() + "\n" +
-					           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
-			                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
-					           );
-			tvWeather2.setText("====== FORECAST 2 ======" + "\n" +
-					   "date: " + forecastInfo.getForecastDate() + "\n" +
-	                   "weather: " + forecastInfo.getForecastText() + "\n" +
-			           "low  temperature in ºC: " + forecastInfo.getForecastTempLowC() + "\n" +
-	                   "high temperature in ºC: " + forecastInfo.getForecastTempHighC() + "\n" +
-			           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
-	                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
-			           );
-			
-			LoadWebImagesTask task = new LoadWebImagesTask();
-			task.execute(
-					weatherInfo.getCurrentConditionIconURL(), 
-					weatherInfo.getForecastInfo1().getForecastConditionIconURL(),
-					weatherInfo.getForecastInfo2().getForecastConditionIconURL()
-					);
+			if (weatherInfo.getCurrentConditionIcon() != null) {
+				mIvWeather0.setImageBitmap(weatherInfo.getCurrentConditionIcon());
+			}
+			for (int i = 0; i < YahooWeather.FORECAST_INFO_MAX_SIZE; i++) {
+				final LinearLayout forecastInfoLayout = (LinearLayout) 
+						getLayoutInflater().inflate(R.layout.forecastinfo, null);
+				final TextView tvWeather = (TextView) forecastInfoLayout.findViewById(R.id.textview_forecast_info);
+				final ForecastInfo forecastInfo = weatherInfo.getForecastInfoList().get(i);
+				tvWeather.setText("====== FORECAST " + (i+1) + " ======" + "\n" +
+				                   "date: " + forecastInfo.getForecastDate() + "\n" +
+				                   "weather: " + forecastInfo.getForecastText() + "\n" +
+						           "low  temperature in ºC: " + forecastInfo.getForecastTempLowC() + "\n" +
+				                   "high temperature in ºC: " + forecastInfo.getForecastTempHighC() + "\n" +
+						           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
+				                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
+						           );
+				final ImageView ivForecast = (ImageView) forecastInfoLayout.findViewById(R.id.imageview_forecast_info);
+				if (forecastInfo.getForecastConditionIcon() != null) {
+					ivForecast.setImageBitmap(forecastInfo.getForecastConditionIcon());
+				}
+				mWeatherInfosLayout.addView(forecastInfoLayout);
+			}
         } else {
         	setNoResultLayout();
         }
 	}
 	
 	private void setNormalLayout() {
-		ivWeather0.setVisibility(View.VISIBLE);
-		ivWeather1.setVisibility(View.VISIBLE);
-		ivWeather2.setVisibility(View.VISIBLE);
-		tvWeather0.setVisibility(View.VISIBLE);
-		tvWeather1.setVisibility(View.VISIBLE);
-		tvWeather2.setVisibility(View.VISIBLE);
-		tvTitle.setVisibility(View.VISIBLE);
-		tvErrorMessage.setVisibility(View.INVISIBLE);
+		mWeatherInfosLayout.setVisibility(View.VISIBLE);
+		mTvTitle.setVisibility(View.VISIBLE);
+		mTvErrorMessage.setVisibility(View.INVISIBLE);
 	}
 	
 	private void setNoResultLayout() {
-		ivWeather0.setVisibility(View.INVISIBLE);
-		ivWeather1.setVisibility(View.INVISIBLE);
-		ivWeather2.setVisibility(View.INVISIBLE);
-		tvWeather0.setVisibility(View.INVISIBLE);
-		tvWeather1.setVisibility(View.INVISIBLE);
-		tvWeather2.setVisibility(View.INVISIBLE);
-		tvTitle.setVisibility(View.INVISIBLE);
-		tvErrorMessage.setVisibility(View.VISIBLE);
-		tvErrorMessage.setText("Sorry, no result returned");
+		mTvTitle.setVisibility(View.INVISIBLE);
+		mWeatherInfosLayout.setVisibility(View.INVISIBLE);
+		mTvErrorMessage.setVisibility(View.VISIBLE);
+		mTvErrorMessage.setText("Sorry, no result returned");
 	}
 	
-	class LoadWebImagesTask extends AsyncTask<String, Void, Bitmap[]> {
-
-		@Override
-		protected Bitmap[] doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			Bitmap[] res = new Bitmap[3];
-			res[0] = ImageUtils.getBitmapFromWeb(params[0]);
-			res[1] = ImageUtils.getBitmapFromWeb(params[1]);
-			res[2] = ImageUtils.getBitmapFromWeb(params[2]);
-			return res;
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap[] results) {
-			// TODO Auto-generated method stub
-			super.onPostExecute(results);
-			ivWeather0.setImageBitmap(results[0]);
-			ivWeather1.setImageBitmap(results[1]);
-			ivWeather2.setImageBitmap(results[2]);
-		}
-		
-	}
-
 }

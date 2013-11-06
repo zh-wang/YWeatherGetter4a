@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package zh.wang.android.utils.YahooWeather4a;
+package zh.wang.android.apis.yahooweather4a;
 
 public class ConditionDefinition {
 	
-	String[] conditionArray = new String[] {
+	public static final String[] CONDITION_LIST = new String[] {
 			"tornado",
 			"tropical storm",
 			"hurricane",
@@ -71,7 +71,7 @@ public class ConditionDefinition {
 			"not available",
 	};
 	
-	public String getConditionByCode(int code) {
-		return conditionArray[code];
+	public static String getConditionByCode(int code) {
+		return CONDITION_LIST[code];
 	}
 }

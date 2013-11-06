@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 
-package zh.wang.android.utils.YahooWeather4a;
+package zh.wang.android.apis.yahooweather4a;
 
+/**
+ * A callback when querying is completed.
+ * @author Zhenghong Wang
+ */
 public interface YahooWeatherInfoListener {
 	public void gotWeatherInfo(WeatherInfo weatherInfo);
 }

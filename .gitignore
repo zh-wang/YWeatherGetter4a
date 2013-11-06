@@ -19,3 +19,7 @@ gen/
 
 # Release Files #
 release/
+
+# ant builder #
+build.xml
+local.properties

@@ -1,4 +1,4 @@
-package zh.wang.android.tools;
+package zh.wang.android.apis.yahooweather4a;
 
 public class AsciiUtils {
 	private static final String PLAIN_ASCII =

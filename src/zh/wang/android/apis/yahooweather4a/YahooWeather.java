@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package zh.wang.android.utils.YahooWeather4a;
+package zh.wang.android.apis.yahooweather4a;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -37,28 +37,67 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import zh.wang.android.utils.YahooWeather4a.WeatherInfo.ForecastInfo;
+import zh.wang.android.apis.yahooweather4a.WeatherInfo.ForecastInfo;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-public class YahooWeatherUtils {
+/**
+ * A wrapper for accessing Yahoo weather informations. 
+ * @author Zhenghong Wang
+ */
+public class YahooWeather {
 	
 	public static final String YAHOO_WEATHER_ERROR = "Yahoo! Weather - Error";
-	
-	private String woeidNumber;
-	private YahooWeatherInfoListener mWeatherInfoResult;
 
-	public static YahooWeatherUtils getInstance() {
-		return new YahooWeatherUtils();
+	public static final int FORECAST_INFO_MAX_SIZE = 5;
+	
+	private String mWoeidNumber;
+	private YahooWeatherInfoListener mWeatherInfoResult;
+	private boolean mNeedDownloadIcons;
+
+	/**
+	 * Get the YahooWeather instance.
+	 * Use this to query weather information from Yahoo.
+	 * @return YahooWeather instance
+	 */
+	public static YahooWeather getInstance() {
+		return new YahooWeather();
 	}
 	
-	public void queryYahooWeather(Context context, String cityName, YahooWeatherInfoListener result) {
+	/**
+	 * Set it to true will enable downloading the default weather icons.
+	 * The Default icons are too tiny, so in most cases, you don't need them.
+	 * @param needDownloadIcons Weather it will enable downloading the default weather icons
+	 */
+	public void setNeedDownloadIcons(final boolean needDownloadIcons) {
+		mNeedDownloadIcons = needDownloadIcons;
+	}
+	
+	/**
+	 * Query Yahoo weather apis to get weather information. 
+	 * Querying will be run on a separated thread to accessing Yahoo's apis.
+	 * When it is completed, a callback will be fired.
+	 * See {@link YahooWeatherInfoListener} for detail.
+	 * @param context app's context
+	 * @param cityAreaOrLocation A city name, like "Shanghai"; an area name, like "Mountain View";
+	 * a pair of city and country, like "Tokyo, Japan"; a location or view spot, like "Eiffel Tower";
+	 * Yahoo's apis will find a closest position for you.
+	 * @param result A {@link WeatherInfo} instance.
+	 */
+	public void queryYahooWeather(final Context context, final String cityAreaOrLocation, 
+			final YahooWeatherInfoListener result) {
+		/* check network available */
+        if (!NetworkUtils.isConnected(context)) {
+        	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
+        	return;
+        }
+        final String convertedlocation = AsciiUtils.convertNonAscii(cityAreaOrLocation);
 		mWeatherInfoResult = result;
-		WeatherQueryTask task = new WeatherQueryTask();
+		final WeatherQueryTask task = new WeatherQueryTask();
 		task.setContext(context);
-		task.execute(new String[]{cityName});
+		task.execute(new String[]{convertedlocation});
 	}
 	
 	private String getWeatherString(Context context, String woeidNumber) {
@@ -173,9 +212,15 @@ public class YahooWeatherUtils {
 			weatherInfo.setCurrentConditionDate(
 					currentConditionNode.getAttributes().getNamedItem("date").getNodeValue());
 			
-			this.parseForecastInfo(weatherInfo.getForecastInfo1(), doc, 0);
-			this.parseForecastInfo(weatherInfo.getForecastInfo2(), doc, 1);
+			if (mNeedDownloadIcons) {
+				weatherInfo.setCurrentConditionIcon(ImageUtils.getBitmapFromWeb(
+						weatherInfo.getCurrentConditionIconURL()));
+			}
 			
+			for (int i = 0; i < FORECAST_INFO_MAX_SIZE; i++) {
+				this.parseForecastInfo(weatherInfo.getForecastInfoList().get(i), doc, i);
+			}
+
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			Toast.makeText(context, "Parse XML failed - Unrecognized Tag", Toast.LENGTH_SHORT).show();
@@ -185,8 +230,8 @@ public class YahooWeatherUtils {
 		return weatherInfo;
 	}
 	
-	private void parseForecastInfo(final ForecastInfo forecastInfo, final Document doc, final int pIndex) {
-		Node forecast1ConditionNode = doc.getElementsByTagName("yweather:forecast").item(pIndex);
+	private void parseForecastInfo(final ForecastInfo forecastInfo, final Document doc, final int index) {
+		Node forecast1ConditionNode = doc.getElementsByTagName("yweather:forecast").item(index);
 		forecastInfo.setForecastCode(Integer.parseInt(
 				forecast1ConditionNode.getAttributes().getNamedItem("code").getNodeValue()
 				));
@@ -204,6 +249,10 @@ public class YahooWeatherUtils {
 				Integer.parseInt(
 						forecast1ConditionNode.getAttributes().getNamedItem("low").getNodeValue()
 						));
+		if (mNeedDownloadIcons) {
+			forecastInfo.setForecastConditionIcon(
+					ImageUtils.getBitmapFromWeb(forecastInfo.getForecastConditionIconURL()));
+		}
 	}
 	
 	private class WeatherQueryTask extends AsyncTask<String, Void, WeatherInfo> {
@@ -218,9 +267,9 @@ public class YahooWeatherUtils {
 		protected WeatherInfo doInBackground(String... cityName) {
 			// TODO Auto-generated method stub
 			WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
-			woeidNumber = woeidUtils.getWOEIDid(mContext, cityName[0]);
-			if(!woeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
-				String weatherString = getWeatherString(mContext, woeidNumber);
+			mWoeidNumber = woeidUtils.getWOEIDid(mContext, cityName[0]);
+			if(!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
+				String weatherString = getWeatherString(mContext, mWoeidNumber);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
 				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
 				return weatherInfo;
