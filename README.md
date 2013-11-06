@@ -26,7 +26,7 @@ https://play.google.com/store/apps/details?id=zh.wang.android.yweathergetter
 			// Add your code here
 		}
 	}
-	```
+	```  
 
   * Second, use following code to assign the location where you want to get weather information at. Or you can input the location in app's top search bar.
 	
