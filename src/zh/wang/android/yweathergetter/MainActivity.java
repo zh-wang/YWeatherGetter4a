@@ -184,7 +184,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	private void searchByPlaceName(String location) {
 		mYahooWeather.setNeedDownloadIcons(true);
 		mYahooWeather.setSearchMode(SEARCH_MODE.PLACE_NAME);
-		mYahooWeather.queryYahooWeather(getApplicationContext(), location, MainActivity.this);
+		mYahooWeather.queryYahooWeatherByPlaceName(getApplicationContext(), location, MainActivity.this);
 	}
 	
 	private void showProgressDialog() {

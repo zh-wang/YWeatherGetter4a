@@ -105,7 +105,7 @@ public class YahooWeather implements LocationResult {
 	 * Yahoo's apis will find a closest position for you.
 	 * @param result A {@link WeatherInfo} instance.
 	 */
-	public void queryYahooWeather(final Context context, final String cityAreaOrLocation, 
+	public void queryYahooWeatherByPlaceName(final Context context, final String cityAreaOrLocation, 
 			final YahooWeatherInfoListener result) {
 		MyLog.d("query yahoo weather by name of place");
 		mContext = context;
@@ -129,7 +129,7 @@ public class YahooWeather implements LocationResult {
 	 * @param lon A string of longitude value
 	 * @param result A {@link WeatherInfo} instance
 	 */
-	public void queryYahooWeather(final Context context, final String lat, final String lon, 
+	public void queryYahooWeatherByLatLon(final Context context, final String lat, final String lon, 
 			final YahooWeatherInfoListener result) {
 		MyLog.d("query yahoo weather by lat lon");
 		mContext = context;
@@ -142,6 +142,12 @@ public class YahooWeather implements LocationResult {
 		task.execute(new String[]{lat, lon});
 	}
 	
+	/**
+	 * Use your device's GPS to automatically detect where you are, then query Yahoo weather apis
+	 * for weather information.
+	 * @param context app's context
+	 * @param result A {@link WeatherInfo} instance
+	 */
 	public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) {
 		MyLog.d("query yahoo weather by gps");
         if (!NetworkUtils.isConnected(context)) {
