@@ -9,11 +9,17 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 public class UserLocationUtils {
+
     Timer timer1;
     LocationManager lm;
     LocationResult locationResult;
     boolean gps_enabled=false;
     boolean network_enabled=false;
+
+    /*
+     * need permission
+     * <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+     */
 
     public boolean findUserLocation(Context context, LocationResult result)
     {

@@ -23,6 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,7 +42,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 public class WOEIDUtils {
@@ -53,9 +56,22 @@ public class WOEIDUtils {
 	private static final String WOEID_QUERY_SUFFIX_FIND_BY_GPS = "%22%20and%20gflags%3D%22R%22";
 
 	private String yahooAPIsQuery;
+	private Map<String, String> mParsedResult;
+	
+	private static WOEIDUtils mInstance = new WOEIDUtils();
 	
 	public static WOEIDUtils getInstance() {
-		return new WOEIDUtils();
+		return mInstance;
+	}
+	
+	public String getWOEIDlocation() {
+		String res = "";
+		Iterator<String> it = mParsedResult.keySet().iterator();
+        while (it.hasNext()) {
+            Object o = it.next();
+            res += (o + " = " + mParsedResult.get(o)) + "\n";
+        }
+        return res;
 	}
 	
 	public String getWOEID(Context context, String cityName) {
@@ -67,22 +83,22 @@ public class WOEIDUtils {
 	}
 
 	private String queryWOEIDfromYahooAPIs(Context context, String uriPlace) {
-		Log.d("tag", "QueryYahooApis by name of place");
+		MyLog.d("Query WOEID by name of place");
 
 		yahooAPIsQuery = WOEID_QUERY_PREFIX_FIND_BY_PLACE + "%22" + uriPlace + "%22"
 				+ WOEID_QUERY_SUFFIX_FORMAT;
 		
 		yahooAPIsQuery = yahooAPIsQuery.replace(" ", "%20");
 		
-		Log.d("tag", "yahooAPIsQuery: " + yahooAPIsQuery);
+		MyLog.d("Query WOEID: " + yahooAPIsQuery);
 
-		String woeidString = queryYahooWeather(context, yahooAPIsQuery);
+		String woeidString = fetchWOEIDxmlString(context, yahooAPIsQuery);
 		Document woeidDoc = convertStringToDocument(context, woeidString);
 		return getFirstMatchingWOEID(woeidDoc);
 	}
 	
 	private String queryWOEIDfromYahooAPIs(Context context, String lat, String lon) {
-		Log.d("tag", "QueryYahooApis by latlon");
+		MyLog.d("Query WOEID by latlon");
 		
 		yahooAPIsQuery = WOEID_QUERY_PREFIX_FIND_BY_GPS + lat +
 						 WOEID_QUERY_CONSECTION_FIND_BY_GPS + lon +
@@ -90,20 +106,17 @@ public class WOEIDUtils {
 		
 		yahooAPIsQuery = yahooAPIsQuery.replace(" ", "%20");
 		
-		Log.d("tag", "yahooAPIsQuery: " + yahooAPIsQuery);
-		String woeidString = queryYahooWeather(context, yahooAPIsQuery);
+		MyLog.d("Query WOEID: " + yahooAPIsQuery);
+		String woeidString = fetchWOEIDxmlString(context, yahooAPIsQuery);
 		Document woeidDoc = convertStringToDocument(context, woeidString);
 		return getFirstMatchingWOEID(woeidDoc);
 	}
 	
-	private String queryYahooWeather(Context context, String queryString) {
-		Log.d("tag", "QueryYahooWeather");
+	private String fetchWOEIDxmlString(Context context, String queryString) {
+		MyLog.d("fetch WOEID xml string");
 		String qResult = "";
-//		queryString = Uri.encode(queryString);
 
 		HttpClient httpClient = new DefaultHttpClient();
-
-		// return Uri.encode(queryString);
 
 		HttpGet httpGet = new HttpGet(queryString);
 
@@ -116,10 +129,11 @@ public class WOEIDUtils {
 				BufferedReader bufferedreader = new BufferedReader(in);
 				StringBuilder stringBuilder = new StringBuilder();
 
-				String stringReadLine = null;
+				String readLine = null;
 
-				while ((stringReadLine = bufferedreader.readLine()) != null) {
-					stringBuilder.append(stringReadLine + "\n");
+				while ((readLine = bufferedreader.readLine()) != null) {
+					MyLog.d(readLine);
+					stringBuilder.append(readLine + "\n");
 				}
 
 				qResult = stringBuilder.toString();
@@ -136,11 +150,10 @@ public class WOEIDUtils {
 		}
 
 		return qResult;
-
 	}
 	
 	private Document convertStringToDocument(Context context, String src) {
-		Log.d("tag", "convertStringToDocument");
+		MyLog.d("convert string to document");
 		Document dest = null;
 
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -168,9 +181,16 @@ public class WOEIDUtils {
 	}
 	
 	private String getFirstMatchingWOEID(Document srcDoc) {
-		Log.d("tag", "parserWOEID");
+		MyLog.d("get first matching WOEID");
 
 		try {
+
+			mParsedResult = new HashMap<String, String>();
+			for (int i = 1; i <= 4; i++) {
+				String name = "line" + i;
+				parseLocationLines(srcDoc, name);
+			}
+
 			NodeList nodeListDescription = srcDoc.getElementsByTagName("woeid");
 			if (nodeListDescription.getLength() > 0) {
 				Node node = nodeListDescription.item(0);
@@ -178,10 +198,20 @@ public class WOEIDUtils {
 			} else {
 				return WOEID_NOT_FOUND;
 			}
+			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return WOEID_NOT_FOUND;
 		}
 		
+	}
+	
+	private void parseLocationLines(Document srcDoc, String name) {
+		NodeList nodeList = srcDoc.getElementsByTagName(name);
+		if (nodeList.getLength() > 0) {
+			Node node = nodeList.item(0);
+			mParsedResult.put(name, node.getTextContent());
+		} 
 	}
 }

@@ -37,9 +37,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import zh.wang.android.apis.yahooweather4a.UserLocationUtils.LocationResult;
 import zh.wang.android.apis.yahooweather4a.WeatherInfo.ForecastInfo;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -47,7 +49,12 @@ import android.widget.Toast;
  * A wrapper for accessing Yahoo weather informations. 
  * @author Zhenghong Wang
  */
-public class YahooWeather {
+public class YahooWeather implements LocationResult {
+
+	public enum SEARCH_MODE {
+		GPS,
+		PLACE_NAME
+	}
 	
 	public static final String YAHOO_WEATHER_ERROR = "Yahoo! Weather - Error";
 
@@ -56,6 +63,18 @@ public class YahooWeather {
 	private String mWoeidNumber;
 	private YahooWeatherInfoListener mWeatherInfoResult;
 	private boolean mNeedDownloadIcons;
+	private SEARCH_MODE mSearchMode;
+	
+	private Context mContext;
+	private static YahooWeather mInstance = new YahooWeather();
+	
+	public SEARCH_MODE getSearchMode() {
+		return mSearchMode;
+	}
+
+	public void setSearchMode(SEARCH_MODE searchMode) {
+		mSearchMode = searchMode;
+	}
 
 	/**
 	 * Get the YahooWeather instance.
@@ -63,7 +82,7 @@ public class YahooWeather {
 	 * @return YahooWeather instance
 	 */
 	public static YahooWeather getInstance() {
-		return new YahooWeather();
+		return mInstance;
 	}
 	
 	/**
@@ -88,7 +107,8 @@ public class YahooWeather {
 	 */
 	public void queryYahooWeather(final Context context, final String cityAreaOrLocation, 
 			final YahooWeatherInfoListener result) {
-		/* check network available */
+		MyLog.d("query yahoo weather by name of place");
+		mContext = context;
         if (!NetworkUtils.isConnected(context)) {
         	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
         	return;
@@ -96,7 +116,6 @@ public class YahooWeather {
         final String convertedlocation = AsciiUtils.convertNonAscii(cityAreaOrLocation);
 		mWeatherInfoResult = result;
 		final WeatherQueryByPlaceTask task = new WeatherQueryByPlaceTask();
-		task.setContext(context);
 		task.execute(new String[]{convertedlocation});
 	}
 	
@@ -112,17 +131,40 @@ public class YahooWeather {
 	 */
 	public void queryYahooWeather(final Context context, final String lat, final String lon, 
 			final YahooWeatherInfoListener result) {
+		MyLog.d("query yahoo weather by lat lon");
+		mContext = context;
         if (!NetworkUtils.isConnected(context)) {
         	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
         	return;
         }
 		mWeatherInfoResult = result;
 		final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
-		task.setContext(context);
 		task.execute(new String[]{lat, lon});
 	}
 	
+	public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) {
+		MyLog.d("query yahoo weather by gps");
+        if (!NetworkUtils.isConnected(context)) {
+        	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
+        	return;
+        }
+		mContext = context;
+		mWeatherInfoResult = result;
+		(new UserLocationUtils()).findUserLocation(context, this);
+	}
+	
+	@Override
+	public void gotLocation(Location location) {
+		final String lat = String.valueOf(location.getLatitude());
+		final String lon = String.valueOf(location.getLongitude());
+//		queryYahooWeather(mContext, lat, lon, this);
+		final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
+		task.execute(new String[]{lat, lon});
+	}
+
 	private String getWeatherString(Context context, String woeidNumber) {
+		MyLog.d("query yahoo weather with WOEID number : " + woeidNumber);
+
 		String qResult = "";
 		String queryString = "http://weather.yahooapis.com/forecastrss?w=" + woeidNumber;
 
@@ -138,10 +180,11 @@ public class YahooWeather {
 				BufferedReader bufferedreader = new BufferedReader(in);
 				StringBuilder stringBuilder = new StringBuilder();
 
-				String stringReadLine = null;
+				String readLine = null;
 
-				while ((stringReadLine = bufferedreader.readLine()) != null) {
-					stringBuilder.append(stringReadLine + "\n");
+				while ((readLine = bufferedreader.readLine()) != null) {
+					MyLog.d(readLine);
+					stringBuilder.append(readLine + "\n");
 				}
 
 				qResult = stringBuilder.toString();
@@ -278,13 +321,6 @@ public class YahooWeather {
 	}
 	
 	private class WeatherQueryByPlaceTask extends AsyncTask<String, Void, WeatherInfo> {
-		
-		private Context mContext;
-		
-		public void setContext(Context context) {
-			mContext = context;
-		}
-
 		@Override
 		protected WeatherInfo doInBackground(String... cityName) {
 			if (cityName == null || cityName.length > 1) {
@@ -307,17 +343,11 @@ public class YahooWeather {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			mWeatherInfoResult.gotWeatherInfo(result);
+			mContext = null;
 		}
 	}
 
 	private class WeatherQueryByLatLonTask extends AsyncTask<String, Void, WeatherInfo> {
-		
-		private Context mContext;
-		
-		public void setContext(Context context) {
-			mContext = context;
-		}
-
 		@Override
 		protected WeatherInfo doInBackground(String... params) {
 			if (params == null || params.length != 2) {
@@ -341,6 +371,7 @@ public class YahooWeather {
 		protected void onPostExecute(WeatherInfo result) {
 			super.onPostExecute(result);
 			mWeatherInfoResult.gotWeatherInfo(result);
+			mContext = null;
 		}
 	}
 

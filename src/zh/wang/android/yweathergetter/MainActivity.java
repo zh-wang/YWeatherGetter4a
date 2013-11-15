@@ -17,20 +17,17 @@
 
 package zh.wang.android.yweathergetter;
 
-import zh.wang.android.apis.yahooweather4a.AsciiUtils;
-import zh.wang.android.apis.yahooweather4a.UserLocationUtils.LocationResult;
+import zh.wang.android.apis.yahooweather4a.MyLog;
 import zh.wang.android.apis.yahooweather4a.WeatherInfo;
 import zh.wang.android.apis.yahooweather4a.WeatherInfo.ForecastInfo;
+import zh.wang.android.apis.yahooweather4a.YahooWeather.SEARCH_MODE;
 import zh.wang.android.apis.yahooweather4a.YahooWeather;
 import zh.wang.android.apis.yahooweather4a.YahooWeatherInfoListener;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Location;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -38,9 +35,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends Activity implements YahooWeatherInfoListener, 
-	LocationResult {
+public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	
 	private ImageView mIvWeather0;
 	private TextView mTvWeather0;
@@ -50,15 +47,17 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 	private Button mBtSearch;
 	private Button mBtGPS;
 	private LinearLayout mWeatherInfosLayout;
+
 	private YahooWeather mYahooWeather = YahooWeather.getInstance();
-    private String mLocation = "Shanghai China";
-    
+
     private ProgressDialog mProgressDialog;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
+
+        MyLog.init(getApplicationContext());
         
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -69,11 +68,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 		mTvErrorMessage = (TextView) findViewById(R.id.textview_error_message);
 		mIvWeather0 = (ImageView) findViewById(R.id.imageview_weather_info_0);
         
-		mYahooWeather.setNeedDownloadIcons(true);
-        mYahooWeather.queryYahooWeather(getApplicationContext(), mLocation, this);
-        
         mEtAreaOfCity = (EditText) findViewById(R.id.edittext_area);
-        mEtAreaOfCity.setText(mLocation);
         
         mBtSearch = (Button) findViewById(R.id.search_button);
         mBtSearch.setOnClickListener(new View.OnClickListener() {
@@ -81,82 +76,52 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 			public void onClick(View v) {
 				String _location = mEtAreaOfCity.getText().toString();
 				if (!TextUtils.isEmpty(_location)) {
-					String _convertedLocation = AsciiUtils.convertNonAscii(_location);
-					mYahooWeather.queryYahooWeather(getApplicationContext(), _convertedLocation, MainActivity.this);
 					InputMethodManager imm = (InputMethodManager)getSystemService(
 	              	      Context.INPUT_METHOD_SERVICE);
 	              	imm.hideSoftInputFromWindow(mEtAreaOfCity.getWindowToken(), 0);
-
-	              	if (mProgressDialog != null && mProgressDialog.isShowing()) {
-	              		mProgressDialog.cancel();
-	              	}
-			        mProgressDialog = new ProgressDialog(MainActivity.this);
-			        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			        mProgressDialog.show();
+	                searchByPlaceName(_location);	
+	                showProgressDialog();
+				} else {
+					Toast.makeText(getApplicationContext(), "location is not inputted", 1).show();
 				}
 			}
 		});
         
         mBtGPS = (Button) findViewById(R.id.gps_button);
         mBtGPS.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-
+				searchByGPS();
+				showProgressDialog();
 			}
 		});
 
-        mEtAreaOfCity.addTextChangedListener(new TextWatcher() {
-			
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				// TODO Auto-generated method stub
-				if(s.toString().length() == 0) {
-					mBtSearch.setText("GPS");
-				} else {
-					mBtSearch.setText("Search");
-				}
-			}
-			
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-        
         mWeatherInfosLayout = (LinearLayout) findViewById(R.id.weather_infos);
      
+        searchByGPS();
     }
     
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		if (mProgressDialog != null && mProgressDialog.isShowing()) {
-			mProgressDialog.cancel();
-			mProgressDialog = null;
-		}
+		hideProgressDialog();
+		mProgressDialog = null;
 		super.onDestroy();
 	}
 
 	@Override
 	public void gotWeatherInfo(WeatherInfo weatherInfo) {
 		// TODO Auto-generated method stub
-		if (mProgressDialog != null && mProgressDialog.isShowing()) {
-			mProgressDialog.cancel();
-		}
+		hideProgressDialog();
         if (weatherInfo != null) {
         	setNormalLayout();
+        	if (mYahooWeather.getSearchMode() == SEARCH_MODE.GPS) {
+        		mEtAreaOfCity.setText("YOUR CURRENT LOCATION");
+        	}
         	mWeatherInfosLayout.removeAllViews();
 			mTvTitle.setText(weatherInfo.getTitle() + "\n"
 					+ weatherInfo.getLocationCity() + ", "
+					+ weatherInfo.getLocationRegion() + ", "
 					+ weatherInfo.getLocationCountry());
 			mTvWeather0.setText("====== CURRENT ======" + "\n" +
 					           "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
@@ -196,13 +161,6 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
         	setNoResultLayout();
         }
 	}
-	
-	@Override
-	public void gotLocation(Location location) {
-		final String lat = String.valueOf(location.getLatitude());
-		final String lon = String.valueOf(location.getLongitude());
-		mYahooWeather.queryYahooWeather(getApplicationContext(), lat, lon, this);
-	}
 
 	private void setNormalLayout() {
 		mWeatherInfosLayout.setVisibility(View.VISIBLE);
@@ -217,4 +175,30 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 		mTvErrorMessage.setText("Sorry, no result returned");
 	}
 	
+	private void searchByGPS() {
+		mYahooWeather.setNeedDownloadIcons(true);
+		mYahooWeather.setSearchMode(SEARCH_MODE.GPS);
+		mYahooWeather.queryYahooWeatherByGPS(getApplicationContext(), this);
+	}
+	
+	private void searchByPlaceName(String location) {
+		mYahooWeather.setNeedDownloadIcons(true);
+		mYahooWeather.setSearchMode(SEARCH_MODE.PLACE_NAME);
+		mYahooWeather.queryYahooWeather(getApplicationContext(), location, MainActivity.this);
+	}
+	
+	private void showProgressDialog() {
+      	if (mProgressDialog != null && mProgressDialog.isShowing()) {
+      		mProgressDialog.cancel();
+      	}
+        mProgressDialog = new ProgressDialog(MainActivity.this);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.show();
+	}
+	
+	private void hideProgressDialog() {
+		if (mProgressDialog != null && mProgressDialog.isShowing()) {
+			mProgressDialog.cancel();
+		}
+	}
 }
