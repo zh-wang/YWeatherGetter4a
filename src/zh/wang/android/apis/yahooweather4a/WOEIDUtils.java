@@ -44,23 +44,33 @@ import android.widget.Toast;
 public class WOEIDUtils {
 	
 	public static final String WOEID_NOT_FOUND = "WOEID_NOT_FOUND"; 
-	private final String yahooapisBase = "http://query.yahooapis.com/v1/public/yql?q=select*from%20geo.places%20where%20text=";
-	private final String yahooapisFormat = "&format=xml";
+
+	private static final String WOEID_QUERY_PREFIX_FIND_BY_PLACE = "http://query.yahooapis.com/v1/public/yql?q=select*from%20geo.places%20where%20text=";
+	private static final String WOEID_QUERY_SUFFIX_FORMAT = "&format=xml";
+	
+	private static final String WOEID_QUERY_PREFIX_FIND_BY_GPS = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.placefinder%20where%20text%3D%22";
+	private static final String WOEID_QUERY_CONSECTION_FIND_BY_GPS = "%2C";
+	private static final String WOEID_QUERY_SUFFIX_FIND_BY_GPS = "%22%20and%20gflags%3D%22R%22";
+
 	private String yahooAPIsQuery;
 	
 	public static WOEIDUtils getInstance() {
 		return new WOEIDUtils();
 	}
 	
-	public String getWOEIDid(Context context, String cityName) {
+	public String getWOEID(Context context, String cityName) {
 		return queryWOEIDfromYahooAPIs(context, cityName);
+	}
+	
+	public String getWOEID(Context context, String lat, String lon) {
+		return queryWOEIDfromYahooAPIs(context, lat, lon);
 	}
 
 	private String queryWOEIDfromYahooAPIs(Context context, String uriPlace) {
-		Log.d("tag", "QueryYahooApis");
+		Log.d("tag", "QueryYahooApis by name of place");
 
-		yahooAPIsQuery = yahooapisBase + "%22" + uriPlace + "%22"
-				+ yahooapisFormat;
+		yahooAPIsQuery = WOEID_QUERY_PREFIX_FIND_BY_PLACE + "%22" + uriPlace + "%22"
+				+ WOEID_QUERY_SUFFIX_FORMAT;
 		
 		yahooAPIsQuery = yahooAPIsQuery.replace(" ", "%20");
 		
@@ -69,7 +79,21 @@ public class WOEIDUtils {
 		String woeidString = queryYahooWeather(context, yahooAPIsQuery);
 		Document woeidDoc = convertStringToDocument(context, woeidString);
 		return getFirstMatchingWOEID(woeidDoc);
-
+	}
+	
+	private String queryWOEIDfromYahooAPIs(Context context, String lat, String lon) {
+		Log.d("tag", "QueryYahooApis by latlon");
+		
+		yahooAPIsQuery = WOEID_QUERY_PREFIX_FIND_BY_GPS + lat +
+						 WOEID_QUERY_CONSECTION_FIND_BY_GPS + lon +
+						 WOEID_QUERY_SUFFIX_FIND_BY_GPS;
+		
+		yahooAPIsQuery = yahooAPIsQuery.replace(" ", "%20");
+		
+		Log.d("tag", "yahooAPIsQuery: " + yahooAPIsQuery);
+		String woeidString = queryYahooWeather(context, yahooAPIsQuery);
+		Document woeidDoc = convertStringToDocument(context, woeidString);
+		return getFirstMatchingWOEID(woeidDoc);
 	}
 	
 	private String queryYahooWeather(Context context, String queryString) {

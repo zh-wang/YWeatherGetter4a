@@ -76,7 +76,7 @@ public class YahooWeather {
 	}
 	
 	/**
-	 * Query Yahoo weather apis to get weather information. 
+	 * Use a name of place to query Yahoo weather apis for weather information. 
 	 * Querying will be run on a separated thread to accessing Yahoo's apis.
 	 * When it is completed, a callback will be fired.
 	 * See {@link YahooWeatherInfoListener} for detail.
@@ -95,9 +95,31 @@ public class YahooWeather {
         }
         final String convertedlocation = AsciiUtils.convertNonAscii(cityAreaOrLocation);
 		mWeatherInfoResult = result;
-		final WeatherQueryTask task = new WeatherQueryTask();
+		final WeatherQueryByPlaceTask task = new WeatherQueryByPlaceTask();
 		task.setContext(context);
 		task.execute(new String[]{convertedlocation});
+	}
+	
+	/** 
+	 * Use lat & lon pair to query Yahoo weather apis for weather information.
+	 * Querying will be run on a separated thread to accessing Yahoo's apis.
+	 * When it is completed, a callback will be fired.
+	 * See {@link YahooWeatherInfoListener} for detail.
+	 * @param context app's context
+	 * @param lat A string of latitude value
+	 * @param lon A string of longitude value
+	 * @param result A {@link WeatherInfo} instance
+	 */
+	public void queryYahooWeather(final Context context, final String lat, final String lon, 
+			final YahooWeatherInfoListener result) {
+        if (!NetworkUtils.isConnected(context)) {
+        	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
+        	return;
+        }
+		mWeatherInfoResult = result;
+		final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
+		task.setContext(context);
+		task.execute(new String[]{lat, lon});
 	}
 	
 	private String getWeatherString(Context context, String woeidNumber) {
@@ -255,7 +277,7 @@ public class YahooWeather {
 		}
 	}
 	
-	private class WeatherQueryTask extends AsyncTask<String, Void, WeatherInfo> {
+	private class WeatherQueryByPlaceTask extends AsyncTask<String, Void, WeatherInfo> {
 		
 		private Context mContext;
 		
@@ -265,9 +287,11 @@ public class YahooWeather {
 
 		@Override
 		protected WeatherInfo doInBackground(String... cityName) {
-			// TODO Auto-generated method stub
+			if (cityName == null || cityName.length > 1) {
+				throw new IllegalArgumentException("Parameter of WeatherQueryByPlaceTask is illegal");
+			}
 			WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
-			mWoeidNumber = woeidUtils.getWOEIDid(mContext, cityName[0]);
+			mWoeidNumber = woeidUtils.getWOEID(mContext, cityName[0]);
 			if(!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
 				String weatherString = getWeatherString(mContext, mWoeidNumber);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
@@ -284,7 +308,40 @@ public class YahooWeather {
 			super.onPostExecute(result);
 			mWeatherInfoResult.gotWeatherInfo(result);
 		}
+	}
+
+	private class WeatherQueryByLatLonTask extends AsyncTask<String, Void, WeatherInfo> {
 		
+		private Context mContext;
+		
+		public void setContext(Context context) {
+			mContext = context;
+		}
+
+		@Override
+		protected WeatherInfo doInBackground(String... params) {
+			if (params == null || params.length != 2) {
+				throw new IllegalArgumentException("Parameter of WeatherQueryByLatLonTask is illegal");
+			}
+			final String lat = params[0];
+			final String lon = params[1];
+			WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
+			mWoeidNumber = woeidUtils.getWOEID(mContext, lat, lon);
+			if (!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
+				String weatherString = getWeatherString(mContext, mWoeidNumber);
+				Document weatherDoc = convertStringToDocument(mContext, weatherString);
+				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
+				return weatherInfo;
+			} else {
+				return null;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(WeatherInfo result) {
+			super.onPostExecute(result);
+			mWeatherInfoResult.gotWeatherInfo(result);
+		}
 	}
 
 }

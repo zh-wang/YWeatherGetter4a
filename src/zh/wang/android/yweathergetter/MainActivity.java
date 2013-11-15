@@ -18,6 +18,7 @@
 package zh.wang.android.yweathergetter;
 
 import zh.wang.android.apis.yahooweather4a.AsciiUtils;
+import zh.wang.android.apis.yahooweather4a.UserLocationUtils.LocationResult;
 import zh.wang.android.apis.yahooweather4a.WeatherInfo;
 import zh.wang.android.apis.yahooweather4a.WeatherInfo.ForecastInfo;
 import zh.wang.android.apis.yahooweather4a.YahooWeather;
@@ -25,8 +26,11 @@ import zh.wang.android.apis.yahooweather4a.YahooWeatherInfoListener;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -35,14 +39,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements YahooWeatherInfoListener {
-
+public class MainActivity extends Activity implements YahooWeatherInfoListener, 
+	LocationResult {
+	
 	private ImageView mIvWeather0;
 	private TextView mTvWeather0;
 	private TextView mTvErrorMessage;
 	private TextView mTvTitle;
 	private EditText mEtAreaOfCity;
 	private Button mBtSearch;
+	private Button mBtGPS;
 	private LinearLayout mWeatherInfosLayout;
 	private YahooWeather mYahooWeather = YahooWeather.getInstance();
     private String mLocation = "Shanghai China";
@@ -52,7 +58,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_activity_layout);
         
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -88,6 +94,41 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 			        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			        mProgressDialog.show();
 				}
+			}
+		});
+        
+        mBtGPS = (Button) findViewById(R.id.gps_button);
+        mBtGPS.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+
+			}
+		});
+
+        mEtAreaOfCity.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				// TODO Auto-generated method stub
+				if(s.toString().length() == 0) {
+					mBtSearch.setText("GPS");
+				} else {
+					mBtSearch.setText("Search");
+				}
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
         
@@ -156,6 +197,13 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
         }
 	}
 	
+	@Override
+	public void gotLocation(Location location) {
+		final String lat = String.valueOf(location.getLatitude());
+		final String lon = String.valueOf(location.getLongitude());
+		mYahooWeather.queryYahooWeather(getApplicationContext(), lat, lon, this);
+	}
+
 	private void setNormalLayout() {
 		mWeatherInfosLayout.setVisibility(View.VISIBLE);
 		mTvTitle.setVisibility(View.VISIBLE);
