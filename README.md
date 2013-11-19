@@ -31,11 +31,20 @@ https://play.google.com/store/apps/details?id=zh.wang.android.yweathergetter
 
   * Second, use following code to assign the location where you want to get weather information at. Or you can input the location in app's top search bar.
     `YahooWeather` class provides 3 methods to query Yahoo's Weather apis.
-    - ` public void queryYahooWeatherByPlaceName(final Context context, final String cityAreaOrLocation, final YahooWeatherInfoListener result) ` - query by place's name, you can replace `cityAreaOrLocation` to what you want. For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.
-    - ` public void queryYahooWeatherByLatLon(final Context context, final String lat, final String lon, final YahooWeatherInfoListener result) ` - query by latitude and longitude
-    - ` public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) ` - use device's gps, to detect current location, then do the query. Remeber, you need ` ACCESS_FINE_LOCATION ` or ` ACCESS_COARSE_LOCATION ` to use this.
+      1. query by place's name, you can replace `cityAreaOrLocation` to what you want. For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.  
+      ```java 
+      public void queryYahooWeatherByPlaceName(final Context context, final String cityAreaOrLocation, final YahooWeatherInfoListener result) 
+      ```  
 
-
+      2. query by latitude and longitude
+      ```java
+      public void queryYahooWeatherByLatLon(final Context context, final String lat, final String lon, final YahooWeatherInfoListener result) 
+      ```  
+      
+      3. use device's gps, to detect current location, then do the query. Remeber, you need ` ACCESS_FINE_LOCATION ` or ` ACCESS_COARSE_LOCATION ` to use this.  
+      ```java 
+      public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) 
+      ```
 
 + What kind of weather information can I get?	
   You can get 
