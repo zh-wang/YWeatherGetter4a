@@ -1,4 +1,4 @@
-package zh.wang.android.apis.yahooweather4a;
+package zh.wang.android.apis.yweathergetter4a;
 
 import java.io.IOException;
 import java.io.InputStream;

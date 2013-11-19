@@ -1,4 +1,4 @@
-package zh.wang.android.apis.yahooweather4a;
+package zh.wang.android.apis.yweathergetter4a;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;

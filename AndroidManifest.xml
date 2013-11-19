@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme" android:debuggable="false">
         
         <activity  android:windowSoftInputMode="stateHidden"
-            android:name="zh.wang.android.yweathergetter.MainActivity"
+            android:name="zh.wang.android.sample.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

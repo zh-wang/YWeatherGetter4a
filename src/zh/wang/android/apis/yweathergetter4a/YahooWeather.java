@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package zh.wang.android.apis.yahooweather4a;
+package zh.wang.android.apis.yweathergetter4a;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -37,8 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import zh.wang.android.apis.yahooweather4a.UserLocationUtils.LocationResult;
-import zh.wang.android.apis.yahooweather4a.WeatherInfo.ForecastInfo;
+import zh.wang.android.apis.yweathergetter4a.UserLocationUtils.LocationResult;
+import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 
 import android.content.Context;
 import android.location.Location;

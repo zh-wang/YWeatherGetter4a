@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package zh.wang.android.apis.yahooweather4a;
+package zh.wang.android.apis.yweathergetter4a;
 
 public class ConditionDefinition {
 	
