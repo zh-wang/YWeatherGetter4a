@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,7 +36,11 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -116,7 +121,11 @@ public class WOEIDUtils {
 		MyLog.d("fetch WOEID xml string");
 		String qResult = "";
 
-		HttpClient httpClient = new DefaultHttpClient();
+		HttpParams params = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(params, 1000 * 5);
+		HttpConnectionParams.setSoTimeout(params, 1000 * 5);
+
+		HttpClient httpClient = new DefaultHttpClient(params);
 
 		HttpGet httpGet = new HttpGet(queryString);
 
@@ -141,12 +150,18 @@ public class WOEIDUtils {
 
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+		} catch (ConnectTimeoutException e) {
+			e.printStackTrace();
+			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+		} catch (SocketTimeoutException e) {
+			e.printStackTrace();
+			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
 		} catch (IOException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+		} finally {
+			httpClient.getConnectionManager().shutdown();
 		}
 
 		return qResult;
