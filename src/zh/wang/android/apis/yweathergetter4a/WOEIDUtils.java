@@ -121,11 +121,7 @@ public class WOEIDUtils {
 		MyLog.d("fetch WOEID xml string");
 		String qResult = "";
 
-		HttpParams params = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(params, 1000 * 5);
-		HttpConnectionParams.setSoTimeout(params, 1000 * 5);
-
-		HttpClient httpClient = new DefaultHttpClient(params);
+		HttpClient httpClient = NetworkUtils.createHttpClient();
 
 		HttpGet httpGet = new HttpGet(queryString);
 

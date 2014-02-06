@@ -16,35 +16,37 @@ https://play.google.com/store/apps/details?id=zh.wang.android.yweathergetter
   This is a wrapper for getting weather information from Yahoo Weather API, for android.
 
 + How do I use it? 
-	
+
    * First, implement YahooWeatherInfoListener in your Activity. Overwrite the callback function "gotWeatherInfo", which will be called after querying from Yahoo weather API. And, you need `INTERNET` and `ACCESS_NETWORK_STATE` to use `YWeatherGetter4a`.
-	
-	```java
-	@Override
-	public void gotWeatherInfo(WeatherInfo weatherInfo) {
-		if(weatherInfo != null) {
-			// Add your code here
+
+    ```java
+    @Override
+    public void gotWeatherInfo(WeatherInfo weatherInfo) {
+        if(weatherInfo != null) {
+            // Add your code here
             // weatherInfo object contains all information returned by Yahoo Weather apis
-		}
-	}
-	```  
+        }
+    }
+    ```  
 
   * Second, use following code to assign the location where you want to get weather information at. Or you can input the location in app's top search bar.
     `YahooWeather` class provides 3 methods to query Yahoo's Weather apis.
-      1. query by place's name, you can replace `cityAreaOrLocation` to what you want. For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.  
+      1. Query by place's name. You can replace `cityAreaOrLocation` to what you want. For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.  
       ```java 
       public void queryYahooWeatherByPlaceName(final Context context, final String cityAreaOrLocation, final YahooWeatherInfoListener result) 
       ```  
 
-      2. query by latitude and longitude
+      2. Query by latitude and longitude
       ```java
       public void queryYahooWeatherByLatLon(final Context context, final String lat, final String lon, final YahooWeatherInfoListener result) 
       ```  
       
-      3. use device's gps, to detect current location, then do the query. Remeber, you need ` ACCESS_FINE_LOCATION ` or ` ACCESS_COARSE_LOCATION ` to use this.  
+      3. Use device's gps to detect current location. Then do the query. Remeber, you need ` ACCESS_FINE_LOCATION ` or ` ACCESS_COARSE_LOCATION ` to use this.  
       ```java 
       public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) 
       ```
+
+      4. You can set connect timeout and socket timeout by `setConnectTimeout` and `setSocketTimeout`. Or get the instance by `getInstance(int connectTimeout, int socketTimeout)`. 
 
 + What kind of weather information can I get?	
   You can get 

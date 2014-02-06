@@ -79,6 +79,14 @@ public class YahooWeather implements LocationResult {
 	public void setSearchMode(SEARCH_MODE searchMode) {
 		mSearchMode = searchMode;
 	}
+	
+	public void setConnectTimeout(int connectTimeout) {
+	    NetworkUtils.getInstance().setConnectTimeout(connectTimeout);
+	}
+	
+	public void setSocketTimeout(int socketTimeout) {
+	    NetworkUtils.getInstance().setSocketTimeout(socketTimeout);
+	}
 
 	/**
 	 * Get the YahooWeather instance.
@@ -86,6 +94,19 @@ public class YahooWeather implements LocationResult {
 	 * @return YahooWeather instance
 	 */
 	public static YahooWeather getInstance() {
+		return mInstance;
+	}
+	
+	/**
+	 * Get the YahooWeather instance.
+	 * Use this to query weather information from Yahoo.
+	 * @param connectTimeout in milliseconds
+	 * @param socketTimeout in milliseconds
+	 * @return YahooWeather instance
+	 */
+	public static YahooWeather getInstance(int connectTimeout, int socketTimeout) {
+	    NetworkUtils.getInstance().setConnectTimeout(connectTimeout);
+	    NetworkUtils.getInstance().setSocketTimeout(socketTimeout);
 		return mInstance;
 	}
 	
@@ -178,11 +199,7 @@ public class YahooWeather implements LocationResult {
 		String qResult = "";
 		String queryString = "http://weather.yahooapis.com/forecastrss?w=" + woeidNumber;
 		
-		HttpParams params = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(params, 1000 * 5);
-		HttpConnectionParams.setSoTimeout(params, 1000 * 5);
-
-		HttpClient httpClient = new DefaultHttpClient(params);
+		HttpClient httpClient = NetworkUtils.createHttpClient();
 
 		HttpGet httpGet = new HttpGet(queryString);
 
