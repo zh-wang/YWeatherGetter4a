@@ -23,3 +23,6 @@ release/
 # ant builder #
 build.xml
 local.properties
+
+# DS file
+.DS_Store

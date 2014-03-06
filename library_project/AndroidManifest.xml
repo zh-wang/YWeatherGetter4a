@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="zh.wang.android.yweathergetter"
+    android:versionCode="4"
+    android:versionName="1.3" >
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="15" />
+
+</manifest>
