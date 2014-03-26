@@ -116,10 +116,12 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
         		mEtAreaOfCity.setText("YOUR CURRENT LOCATION");
         	}
         	mWeatherInfosLayout.removeAllViews();
-			mTvTitle.setText(weatherInfo.getTitle() + "\n"
-					+ weatherInfo.getLocationCity() + ", "
-					+ weatherInfo.getLocationRegion() + ", "
-					+ weatherInfo.getLocationCountry());
+			mTvTitle.setText(
+			        weatherInfo.getTitle() + "\n"
+					+ weatherInfo.getWOEIDneighborhood() + ", "
+					+ weatherInfo.getWOEIDCounty() + ", "
+					+ weatherInfo.getWOEIDState() + ", " 
+					+ weatherInfo.getWOEIDCountry());
 			mTvWeather0.setText("====== CURRENT ======" + "\n" +
 					           "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
 							   "weather: " + weatherInfo.getCurrentText() + "\n" +

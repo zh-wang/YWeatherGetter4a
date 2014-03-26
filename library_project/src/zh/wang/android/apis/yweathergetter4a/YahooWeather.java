@@ -78,18 +78,6 @@ public class YahooWeather implements LocationResult {
 	public void setSearchMode(SEARCH_MODE searchMode) {
 		mSearchMode = searchMode;
 	}
-	
-	public void setConnectTimeout(int connectTimeout) {
-	    NetworkUtils.getInstance().setConnectTimeout(connectTimeout);
-	}
-	
-	public void setSocketTimeout(int socketTimeout) {
-	    NetworkUtils.getInstance().setSocketTimeout(socketTimeout);
-	}
-	
-	public void setDebuggable(final boolean isDebuggable) {
-	    YahooWeatherLog.setDebuggable(isDebuggable);
-	}
 
 	/**
 	 * Get the YahooWeather instance.
@@ -120,8 +108,8 @@ public class YahooWeather implements LocationResult {
 	 * @param isDebbugable set if you want some debug log in Logcat
 	 * @return YahooWeather instance
 	 */
-	public static YahooWeather getInstance(int connectTimeout, int socketTimeout, boolean isDebbugable) {
-	    mInstance.setDebuggable(isDebbugable);
+	public static YahooWeather getInstance(int connectTimeout, int socketTimeout, boolean isDebuggable) {
+	    YahooWeatherLog.setDebuggable(isDebuggable);
 	    NetworkUtils.getInstance().setConnectTimeout(connectTimeout);
 	    NetworkUtils.getInstance().setSocketTimeout(socketTimeout);
 		return mInstance;
@@ -214,11 +202,13 @@ public class YahooWeather implements LocationResult {
 		YahooWeatherLog.d("query yahoo weather with WOEID number : " + woeidNumber);
 
 		String qResult = "";
-		String queryString = "http://weather.yahooapis.com/forecastrss?w=" + woeidNumber;
+		String queryUrl = "http://weather.yahooapis.com/forecastrss?w=" + woeidNumber;
+		
+		YahooWeatherLog.d("query url : " + queryUrl);
 		
 		HttpClient httpClient = NetworkUtils.createHttpClient();
 
-		HttpGet httpGet = new HttpGet(queryString);
+		HttpGet httpGet = new HttpGet(queryUrl);
 
 		try {
 			HttpEntity httpEntity = httpClient.execute(httpGet).getEntity();
@@ -405,7 +395,8 @@ public class YahooWeather implements LocationResult {
 	}
 
 	private class WeatherQueryByLatLonTask extends AsyncTask<String, Void, WeatherInfo> {
-		@Override
+
+        @Override
 		protected WeatherInfo doInBackground(String... params) {
 			if (params == null || params.length != 2) {
 				throw new IllegalArgumentException("Parameter of WeatherQueryByLatLonTask is illegal");
@@ -418,6 +409,13 @@ public class YahooWeather implements LocationResult {
 				String weatherString = getWeatherString(mContext, mWoeidNumber);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
 				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
+    			/*
+    			 * pass some woied info
+    			 */
+				weatherInfo.mWOEIDneighborhood = woeidUtils.getWoeidInfo().mNeighborhood;
+				weatherInfo.mWOEIDCounty = woeidUtils.getWoeidInfo().mCounty;
+				weatherInfo.mWOEIDState = woeidUtils.getWoeidInfo().mState;
+				weatherInfo.mWOEIDCountry = woeidUtils.getWoeidInfo().mCountry;
 				return weatherInfo;
 			} else {
 				return null;

@@ -10,6 +10,7 @@ class WOEIDInfo {
     String mName;
     String mAddition;
     String mPostal;
+    String mNeighborhood;
     String mCity;
     String mCounty;
     String mState;
@@ -114,6 +115,10 @@ class WOEIDInfo {
         return mAddition;
     }
 
+    public String getNeighborhood() {
+        return mNeighborhood;
+    }
+
     public String getPostal() {
         return mPostal;
     }
@@ -144,5 +149,9 @@ class WOEIDInfo {
 
     public String getWOEID() {
         return mWOEID;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        mNeighborhood = neighborhood;
     }
 }

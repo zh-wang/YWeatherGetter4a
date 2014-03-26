@@ -78,6 +78,14 @@ public class WeatherInfo {
 	ForecastInfo mForecastInfo5 = new ForecastInfo();
 	private List<ForecastInfo> mForecastInfoList;
 	
+	/*
+	 * detail location info from woeid result
+	 */
+	String mWOEIDneighborhood;
+	String mWOEIDCounty;
+	String mWOEIDCountry;
+	String mWOEIDState;
+	
 	public WeatherInfo() {
 		mForecastInfoList = new ArrayList<WeatherInfo.ForecastInfo>();
 		mForecastInfoList.add(mForecastInfo1);
@@ -345,7 +353,39 @@ public class WeatherInfo {
 		return (tempF - 32) * 5 / 9;
 	}
 
-	public class ForecastInfo {
+	protected void setWOEIDneighborhood(String wOEIDneighborhood) {
+        mWOEIDneighborhood = wOEIDneighborhood;
+    }
+
+    protected void setWOEIDCounty(String wOEIDCounty) {
+        mWOEIDCounty = wOEIDCounty;
+    }
+
+    protected void setWOEIDCountry(String wOEIDCountry) {
+        mWOEIDCountry = wOEIDCountry;
+    }
+
+    protected void setWOEIDState(String wOEIDState) {
+        mWOEIDState = wOEIDState;
+    }
+
+    public String getWOEIDneighborhood() {
+        return mWOEIDneighborhood;
+    }
+
+    public String getWOEIDCounty() {
+        return mWOEIDCounty;
+    }
+
+    public String getWOEIDCountry() {
+        return mWOEIDCountry;
+    }
+
+    public String getWOEIDState() {
+        return mWOEIDState;
+    }
+
+    public class ForecastInfo {
 		private String mForecastDay;
 		private String mForecastDate;
 		private int mForecastCode;
