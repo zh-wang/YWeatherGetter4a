@@ -48,6 +48,8 @@ import android.widget.Toast;
 class WOEIDUtils {
 	
 	public static final String WOEID_NOT_FOUND = "WOEID_NOT_FOUND"; 
+	
+	public static final int QUALITY_NOT_DEFINED = -1;
 
 	private static final String WOEID_QUERY_PREFIX_FIND_BY_PLACE = "http://query.yahooapis.com/v1/public/yql?q=select*from%20geo.places%20where%20text=";
 	private static final String WOEID_QUERY_SUFFIX_FORMAT = "&format=xml";
@@ -216,8 +218,12 @@ class WOEIDUtils {
 		    getTextContentByTagName(srcDoc, YahooWeatherConsts.WOEID_RESULT_TAG_LSIT[i]);
 		}
 		
-		mWoeidInfo.mQuality = Integer.parseInt(
-		        getTextContentByTagName(srcDoc, YahooWeatherConsts.XML_TAG_WOEID_QUALITY));
+		try {
+    		mWoeidInfo.mQuality = Integer.parseInt(
+    		        getTextContentByTagName(srcDoc, YahooWeatherConsts.XML_TAG_WOEID_QUALITY));
+		} catch (NumberFormatException e) {
+		    mWoeidInfo.mQuality = QUALITY_NOT_DEFINED;
+		}
 		mWoeidInfo.mWOEID = getTextContentByTagName
 		        (srcDoc, YahooWeatherConsts.XML_TAG_WOEID_WOEID);
 		mWoeidInfo.mRadius = getTextContentByTagName
