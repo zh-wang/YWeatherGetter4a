@@ -43,7 +43,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
-import android.widget.Toast;
 
 class WOEIDUtils {
 	
@@ -160,16 +159,16 @@ class WOEIDUtils {
 
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (ConnectTimeoutException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (SocketTimeoutException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} finally {
 			httpClient.getConnectionManager().shutdown();
 		}
@@ -187,18 +186,15 @@ class WOEIDUtils {
 		try {
 			parser = dbFactory.newDocumentBuilder();
 			dest = parser.parse(new ByteArrayInputStream(src.getBytes()));
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-			Toast.makeText(context, e1.toString(), Toast.LENGTH_LONG)
-					.show();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (SAXException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG)
-					.show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG)
-					.show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		}
 
 		return dest;

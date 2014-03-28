@@ -1,6 +1,8 @@
 package zh.wang.android.apis.yweathergetter4a;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 class YahooWeatherLog {
 	
@@ -19,6 +21,10 @@ class YahooWeatherLog {
 	public static void d(final String message) {
 		if (!isDebuggable) return;
 		Log.d(TAG, message);
+	}
+	
+	public static void shortToast(final Context context, final String s) {
+	    Toast.makeText(context, TAG + s, Toast.LENGTH_SHORT).show();
 	}
 
 }

@@ -43,7 +43,6 @@ import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 /**
  * A wrapper for accessing Yahoo weather informations. 
@@ -140,7 +139,7 @@ public class YahooWeather implements LocationResult {
 		YahooWeatherLog.d("query yahoo weather by name of place");
 		mContext = context;
         if (!NetworkUtils.isConnected(context)) {
-        	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
+        	YahooWeatherLog.shortToast(context, "Network connection is unavailable!!");
         	return;
         }
         final String convertedlocation = AsciiUtils.convertNonAscii(cityAreaOrLocation);
@@ -164,7 +163,7 @@ public class YahooWeather implements LocationResult {
 		YahooWeatherLog.d("query yahoo weather by lat lon");
 		mContext = context;
         if (!NetworkUtils.isConnected(context)) {
-        	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
+        	YahooWeatherLog.shortToast(context, "Network connection is unavailable!!");
         	return;
         }
 		mWeatherInfoResult = result;
@@ -181,7 +180,7 @@ public class YahooWeather implements LocationResult {
 	public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) {
 		YahooWeatherLog.d("query yahoo weather by gps");
         if (!NetworkUtils.isConnected(context)) {
-        	Toast.makeText(context, "Network connection is unavailable!!", Toast.LENGTH_SHORT).show();
+        	YahooWeatherLog.shortToast(context, "Network connection is unavailable!!");
         	return;
         }
 		mContext = context;
@@ -191,9 +190,12 @@ public class YahooWeather implements LocationResult {
 	
 	@Override
 	public void gotLocation(Location location) {
+	    if (location == null) {
+	        YahooWeatherLog.shortToast(mContext, "GPS location cannot be found!");
+	        return;
+	    }
 		final String lat = String.valueOf(location.getLatitude());
 		final String lon = String.valueOf(location.getLongitude());
-//		queryYahooWeather(mContext, lat, lon, this);
 		final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
 		task.execute(new String[]{lat, lon});
 	}
@@ -231,16 +233,16 @@ public class YahooWeather implements LocationResult {
 
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (ConnectTimeoutException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (SocketTimeoutException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} finally {
 			httpClient.getConnectionManager().shutdown();
 		}
@@ -257,15 +259,15 @@ public class YahooWeather implements LocationResult {
 		try {
 			parser = dbFactory.newDocumentBuilder();
 			dest = parser.parse(new ByteArrayInputStream(src.getBytes()));
-		} catch (ParserConfigurationException e1) {
-			e1.printStackTrace();
-			Toast.makeText(context, e1.toString(), Toast.LENGTH_LONG).show();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (SAXException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+			YahooWeatherLog.shortToast(context, e.toString());
 		}
 
 		return dest;
@@ -335,7 +337,7 @@ public class YahooWeather implements LocationResult {
 
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			Toast.makeText(context, "Parse XML failed - Unrecognized Tag", Toast.LENGTH_SHORT).show();
+			YahooWeatherLog.shortToast(context, "Parse XML failed - Unrecognized Tag");
 			weatherInfo = null;
 		}
 		
@@ -379,6 +381,13 @@ public class YahooWeather implements LocationResult {
 				String weatherString = getWeatherString(mContext, mWoeidNumber);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
 				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
+    			/*
+    			 * pass some woied info
+    			 */
+				weatherInfo.mWOEIDneighborhood = woeidUtils.getWoeidInfo().mNeighborhood;
+				weatherInfo.mWOEIDCounty = woeidUtils.getWoeidInfo().mCounty;
+				weatherInfo.mWOEIDState = woeidUtils.getWoeidInfo().mState;
+				weatherInfo.mWOEIDCountry = woeidUtils.getWoeidInfo().mCountry;
 				return weatherInfo;
 			} else {
 				return null;

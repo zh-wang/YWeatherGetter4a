@@ -1,23 +1,23 @@
 package zh.wang.android.apis.yweathergetter4a;
 
 class WOEIDInfo {
-    int mQuality;
-    String mLatitude;
-    String mLongtitde;
-    String mOffsetLatitude;
-    String mOffsetLongitude;
-    String mRadius;
-    String mName;
-    String mAddition;
-    String mPostal;
-    String mNeighborhood;
-    String mCity;
-    String mCounty;
-    String mState;
-    String mCountry;
-    String mCountrycode;
-    String mStatecode;
-    String mWOEID;
+    int mQuality = 0;
+    String mLatitude = "";
+    String mLongtitde = "";
+    String mOffsetLatitude = "";
+    String mOffsetLongitude = "";
+    String mRadius = "";
+    String mName = "";
+    String mAddition = "";
+    String mPostal = "";
+    String mNeighborhood = "";
+    String mCity = "";
+    String mCounty = "";
+    String mState = "";
+    String mCountry = "";
+    String mCountrycode = "";
+    String mStatecode = "";
+    String mWOEID = "";
 
     protected void setQuality(int quality) {
         mQuality = quality;
