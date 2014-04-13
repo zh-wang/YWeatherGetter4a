@@ -102,6 +102,9 @@ class WOEIDUtils {
 
 		String woeidString = fetchWOEIDxmlString(context, yahooAPIsQuery);
 		Document woeidDoc = convertStringToDocument(context, woeidString);
+		if (woeidDoc == null) {
+		    return WOEID_NOT_FOUND;
+		}
 		parseWOEID(woeidDoc);
 		if (mWoeidInfo.getWOEID() == null) {
 		    return WOEID_NOT_FOUND;
@@ -122,6 +125,9 @@ class WOEIDUtils {
 		YahooWeatherLog.d("Query WOEID: " + yahooAPIsQuery);
 		String woeidString = fetchWOEIDxmlString(context, yahooAPIsQuery);
 		Document woeidDoc = convertStringToDocument(context, woeidString);
+		if (woeidDoc == null) {
+		    return WOEID_NOT_FOUND;
+		}
 		parseWOEID(woeidDoc);
 		if (mWoeidInfo.getWOEID() == null) {
 		    return WOEID_NOT_FOUND;

@@ -172,6 +172,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 		mWeatherInfosLayout.setVisibility(View.INVISIBLE);
 		mTvErrorMessage.setVisibility(View.VISIBLE);
 		mTvErrorMessage.setText("Sorry, no result returned");
+	    mProgressDialog.cancel();
 	}
 	
 	private void searchByGPS() {
