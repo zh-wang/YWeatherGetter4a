@@ -19,7 +19,7 @@ class ImageUtils {
             Bitmap myBitmap = BitmapFactory.decodeStream(input);
             return myBitmap;
         } catch (IOException e) {
-            e.printStackTrace();
+            YahooWeatherLog.printStack(e);
             return null;
         }
     }

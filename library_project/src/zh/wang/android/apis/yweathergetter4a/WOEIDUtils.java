@@ -57,15 +57,21 @@ class WOEIDUtils {
 	private static final String WOEID_QUERY_CONSECTION_FIND_BY_GPS = "%2C";
 	private static final String WOEID_QUERY_SUFFIX_FIND_BY_GPS = "%22%20and%20gflags%3D%22R%22";
 
+	private static WOEIDUtils mInstance = new WOEIDUtils();
+	
+	private YahooWeatherExceptionListener mExceptionListener;
+
 	private String yahooAPIsQuery;
 	private Map<String, String> mParsedResult;
 	
 	private WOEIDInfo mWoeidInfo = new WOEIDInfo();
-
-	private static WOEIDUtils mInstance = new WOEIDUtils();
 	
 	public static WOEIDUtils getInstance() {
 		return mInstance;
+	}
+	
+	public void setExceptionListener(final YahooWeatherExceptionListener exceptionListener) {
+	    this.mExceptionListener = exceptionListener;
 	}
 	
 	public String getWOEIDlocation() {
@@ -164,17 +170,17 @@ class WOEIDUtils {
 			}
 
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-			YahooWeatherLog.shortToast(context, e.toString());
+		    YahooWeatherLog.printStack(e);
+			if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
 		} catch (ConnectTimeoutException e) {
-			e.printStackTrace();
-			YahooWeatherLog.shortToast(context, e.toString());
+		    YahooWeatherLog.printStack(e);
+			if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
 		} catch (SocketTimeoutException e) {
-			e.printStackTrace();
-			YahooWeatherLog.shortToast(context, e.toString());
+		    YahooWeatherLog.printStack(e);
+			if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
 		} catch (IOException e) {
-			e.printStackTrace();
-			YahooWeatherLog.shortToast(context, e.toString());
+		    YahooWeatherLog.printStack(e);
+			if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
 		} finally {
 			httpClient.getConnectionManager().shutdown();
 		}
@@ -193,14 +199,14 @@ class WOEIDUtils {
 			parser = dbFactory.newDocumentBuilder();
 			dest = parser.parse(new ByteArrayInputStream(src.getBytes()));
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			YahooWeatherLog.shortToast(context, e.toString());
+		    YahooWeatherLog.printStack(e);
+			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
 		} catch (SAXException e) {
-			e.printStackTrace();
-			YahooWeatherLog.shortToast(context, e.toString());
+		    YahooWeatherLog.printStack(e);
+			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
 		} catch (IOException e) {
-			e.printStackTrace();
-			YahooWeatherLog.shortToast(context, e.toString());
+		    YahooWeatherLog.printStack(e);
+			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
 		}
 
 		return dest;

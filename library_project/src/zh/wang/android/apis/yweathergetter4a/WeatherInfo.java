@@ -28,40 +28,40 @@ import android.graphics.Bitmap;
  */
 public class WeatherInfo {
 	
-	String mTitle;
-	String mDescription;
-	String mLanguage;
-	String mLastBuildDate;
-	String mLocationCity;
-	String mLocationRegion; // region may be null
-	String mLocationCountry;
+	String mTitle = "";
+	String mDescription = "";
+	String mLanguage = "";
+	String mLastBuildDate = "";
+	String mLocationCity = "";
+	String mLocationRegion = "";
+	String mLocationCountry = "";
 	
-	String mWindChill;
-	String mWindDirection;
-	String mWindSpeed;
+	String mWindChill = "";
+	String mWindDirection = "";
+	String mWindSpeed = "";
 	
-	String mAtmosphereHumidity;
-	String mAtmosphereVisibility;
-	String mAtmospherePressure;
-	String mAtmosphereRising;
+	String mAtmosphereHumidity = "";
+	String mAtmosphereVisibility = "";
+	String mAtmospherePressure = "";
+	String mAtmosphereRising = "";
 	
-	String mAstronomySunrise;
-	String mAstronomySunset;
+	String mAstronomySunrise = "";
+	String mAstronomySunset = "";
 	
-	String mConditionTitle;
-	String mConditionLat;
-	String mConditionLon;
+	String mConditionTitle = "";
+	String mConditionLat = "";
+	String mConditionLon = "";
 
 	/*
 	 * information in tag "yweather:condition"
 	 */
-	int mCurrentCode;
-	String mCurrentText;
-	int mCurrentTempC;
-	int mCurrentTempF;
-	String mCurrentConditionIconURL;
-	Bitmap mCurrentConditionIcon;
-	String mCurrentConditionDate;
+	int mCurrentCode = 0;
+	String mCurrentText = "";
+	int mCurrentTempC = 0;
+	int mCurrentTempF = 0;
+	String mCurrentConditionIconURL = "";
+	Bitmap mCurrentConditionIcon = null;
+	String mCurrentConditionDate = "";
 
 	/*
 	 * information in the first tag "yweather:forecast"
@@ -76,15 +76,15 @@ public class WeatherInfo {
 	ForecastInfo mForecastInfo3 = new ForecastInfo();
 	ForecastInfo mForecastInfo4 = new ForecastInfo();
 	ForecastInfo mForecastInfo5 = new ForecastInfo();
-	private List<ForecastInfo> mForecastInfoList;
+	private List<ForecastInfo> mForecastInfoList = null;
 	
 	/*
 	 * detail location info from woeid result
 	 */
-	String mWOEIDneighborhood;
-	String mWOEIDCounty;
-	String mWOEIDCountry;
-	String mWOEIDState;
+	String mWOEIDneighborhood = "";
+	String mWOEIDCounty = "";
+	String mWOEIDCountry = "";
+	String mWOEIDState = "";
 	
 	public WeatherInfo() {
 		mForecastInfoList = new ArrayList<WeatherInfo.ForecastInfo>();
