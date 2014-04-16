@@ -18,6 +18,7 @@
 package zh.wang.android.yweathergetter4a.sample;
 
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo;
+import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
@@ -36,7 +37,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements YahooWeatherInfoListener {
+public class MainActivity extends Activity implements YahooWeatherInfoListener,
+    YahooWeatherExceptionListener {
 	
 	private ImageView mIvWeather0;
 	private TextView mTvWeather0;
@@ -55,6 +57,8 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
+        
+        mYahooWeather.setExceptionListener(this);
         
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -160,6 +164,24 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
         	setNoResultLayout();
         }
 	}
+
+    @Override
+    public void onFailConnection(final Exception e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onFailParsing(final Exception e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onFailFindLocation(final Exception e) {
+        // TODO Auto-generated method stub
+        
+    }
 
 	private void setNormalLayout() {
 		mWeatherInfosLayout.setVisibility(View.VISIBLE);

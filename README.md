@@ -47,7 +47,9 @@ https://play.google.com/store/apps/details?id=zh.wang.android.yweathergetter
       public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) 
       ```
 
-      4. You can set connect timeout and socket timeout by `setConnectTimeout` and `setSocketTimeout`. Or get the instance by `getInstance(int connectTimeout, int socketTimeout)`. 
+      4. You can set connect timeout and socket timeout by `setConnectTimeout` and `setSocketTimeout`. Or get the instance by `getInstance(int connectTimeout, int socketTimeout)`.   
+
+      5. Handle exception by using `setExceptionListener`.
 
 + What kind of weather information can I get?	
   You can get 
