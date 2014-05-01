@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package zh.wang.android.yweathergetter4a.sample;
+package zh.wang.android.yweathergetter;
 
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
@@ -23,6 +23,7 @@ import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
+import zh.wang.android.yweathergetter.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
