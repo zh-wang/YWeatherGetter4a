@@ -290,7 +290,7 @@ public class YahooWeather implements LocationResult {
 		return dest;
 	}
 	
-	private WeatherInfo parseWeatherInfo(Context context, Document doc) {
+	private WeatherInfo parseWeatherInfo(Context context, Document doc, WOEIDInfo woeidInfo) {
 		WeatherInfo weatherInfo = new WeatherInfo();
 		try {
 			
@@ -352,6 +352,14 @@ public class YahooWeather implements LocationResult {
 				this.parseForecastInfo(weatherInfo.getForecastInfoList().get(i), doc, i);
 			}
 
+			/*
+			 * pass some woied info
+			 */
+			weatherInfo.mWOEIDneighborhood = woeidInfo.mNeighborhood;
+			weatherInfo.mWOEIDCounty = woeidInfo.mCounty;
+			weatherInfo.mWOEIDState = woeidInfo.mState;
+			weatherInfo.mWOEIDCountry = woeidInfo.mCountry;
+
 		} catch (NullPointerException e) {
 		    YahooWeatherLog.printStack(e);
 			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
@@ -397,14 +405,7 @@ public class YahooWeather implements LocationResult {
 			if(!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
 				String weatherString = getWeatherString(mContext, mWoeidNumber);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
-				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
-    			/*
-    			 * pass some woied info
-    			 */
-				weatherInfo.mWOEIDneighborhood = woeidUtils.getWoeidInfo().mNeighborhood;
-				weatherInfo.mWOEIDCounty = woeidUtils.getWoeidInfo().mCounty;
-				weatherInfo.mWOEIDState = woeidUtils.getWoeidInfo().mState;
-				weatherInfo.mWOEIDCountry = woeidUtils.getWoeidInfo().mCountry;
+				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc, woeidUtils.getWoeidInfo());
 				return weatherInfo;
 			} else {
 				return null;
@@ -434,14 +435,7 @@ public class YahooWeather implements LocationResult {
 			if (!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
 				String weatherString = getWeatherString(mContext, mWoeidNumber);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
-				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
-    			/*
-    			 * pass some woied info
-    			 */
-				weatherInfo.mWOEIDneighborhood = woeidUtils.getWoeidInfo().mNeighborhood;
-				weatherInfo.mWOEIDCounty = woeidUtils.getWoeidInfo().mCounty;
-				weatherInfo.mWOEIDState = woeidUtils.getWoeidInfo().mState;
-				weatherInfo.mWOEIDCountry = woeidUtils.getWoeidInfo().mCountry;
+				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc, woeidUtils.getWoeidInfo());
 				return weatherInfo;
 			} else {
 				return null;
