@@ -14,7 +14,9 @@ https://play.google.com/store/apps/details?id=zh.wang.android.yweathergetter
 
 +  What is this?	 
 
-  This is a wrapper for getting weather information from Yahoo Weather API, for android.
+  This is a wrapper for getting weather information from Yahoo Weather RSS Feed.  
+  You can find its guideline here.  [Yahoo Weather RSS Feed](https://developer.yahoo.com/weather/).  
+  Note that, if you want to use weather API for commercial purpose, you should contact Yahoo's staff first.  
 
 + How do I use it? 
 
