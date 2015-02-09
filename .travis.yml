@@ -1,5 +1,8 @@
 language: android
 before_script: 
+    - cd library_project
+    - android update project -p ./
+    - cd ..
     - cd sample_app
     - android update project -p ./
 android:
