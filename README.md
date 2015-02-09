@@ -1,4 +1,4 @@
-YWeatherGetter4a
+YWeatherGetter4a [![Build Status](https://travis-ci.org/zh-wang/YWeatherGetter4a.svg?branch=master)](https://travis-ci.org/zh-wang/YWeatherGetter4a)
 ================
 
 An Yahoo Weather API wrapper for android
