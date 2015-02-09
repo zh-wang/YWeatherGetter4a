@@ -1,10 +1,13 @@
 language: android
-before_script: 
+before_script:
     - cd library_project
-    - android update project -p ./
+    - android update project -p .
     - cd ..
     - cd sample_app
-    - android update project -p ./
+    - android update project -p .
+    - android update test-project -m ../sample_app/ -p ../sample_app-test
+    - cd ..
+    - cd sample_app-test
 android:
   components:
     # Uncomment the lines below if you want to
