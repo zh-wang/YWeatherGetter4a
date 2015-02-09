@@ -1,5 +1,5 @@
 language: android
-before_script:
+script:
     - cd library_project
     - android update project -p .
     - cd ..
@@ -8,6 +8,7 @@ before_script:
     - android update test-project -m ../sample_app/ -p ../sample_app-test
     - cd ..
     - cd sample_app-test
+    - ant debug install test
 android:
   components:
     # Uncomment the lines below if you want to
