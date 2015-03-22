@@ -68,6 +68,9 @@ public class YahooWeather implements LocationResult {
 	private boolean mNeedDownloadIcons;
 	private SEARCH_MODE mSearchMode;
 	
+	// Use Metric units by default
+	private char mUnit = 'c';
+	
 	private Context mContext;
 	private static YahooWeather mInstance = new YahooWeather();
 	
@@ -77,6 +80,18 @@ public class YahooWeather implements LocationResult {
 
 	public void setSearchMode(SEARCH_MODE searchMode) {
 		mSearchMode = searchMode;
+	}
+	
+	/**
+	 * Necessary only if Imperial units to be used instead of Metric
+	 */
+	public void setUnit(char unit) {
+		if (unit == 'f')
+			mUnit = unit;
+	}
+	
+	public char getUnit() {
+		return mUnit;
 	}
 
 	/**
@@ -217,11 +232,11 @@ public class YahooWeather implements LocationResult {
 		task.execute(new String[]{lat, lon});
 	}
 
-	private String getWeatherString(Context context, String woeidNumber) {
+	private String getWeatherString(Context context, String woeidNumber, char unit) {
 		YahooWeatherLog.d("query yahoo weather with WOEID number : " + woeidNumber);
 
 		String qResult = "";
-		String queryUrl = "http://weather.yahooapis.com/forecastrss?w=" + woeidNumber;
+		String queryUrl = "http://weather.yahooapis.com/forecastrss?w=" + woeidNumber + "&u=" + unit;
 		
 		YahooWeatherLog.d("query url : " + queryUrl);
 		
@@ -403,7 +418,7 @@ public class YahooWeather implements LocationResult {
 			WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
 			mWoeidNumber = woeidUtils.getWOEID(mContext, cityName[0]);
 			if(!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
-				String weatherString = getWeatherString(mContext, mWoeidNumber);
+				String weatherString = getWeatherString(mContext, mWoeidNumber, mUnit);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
 				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc, woeidUtils.getWoeidInfo());
 				return weatherInfo;
@@ -433,7 +448,7 @@ public class YahooWeather implements LocationResult {
 			WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
 			mWoeidNumber = woeidUtils.getWOEID(mContext, lat, lon);
 			if (!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
-				String weatherString = getWeatherString(mContext, mWoeidNumber);
+				String weatherString = getWeatherString(mContext, mWoeidNumber, mUnit);
 				Document weatherDoc = convertStringToDocument(mContext, weatherString);
 				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc, woeidUtils.getWoeidInfo());
 				return weatherInfo;
