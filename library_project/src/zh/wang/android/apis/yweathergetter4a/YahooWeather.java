@@ -58,6 +58,11 @@ public class YahooWeather implements LocationResult {
 		PLACE_NAME
 	}
 	
+	public enum UNIT {
+	    FAHRENHEIT,
+	    CELSIUS,
+	}
+	
 	public static final String YAHOO_WEATHER_ERROR = "Yahoo! Weather - Error";
 
 	public static final int FORECAST_INFO_MAX_SIZE = 5;
@@ -84,7 +89,10 @@ public class YahooWeather implements LocationResult {
 	
 	/**
 	 * Necessary only if Imperial units to be used instead of Metric
-	 */
+	 * @param unit, should be 'f' or 'c'. 'c' in default.
+	 * Units for temperature (case sensitive) f: Fahrenheit c: Celsius
+	 * See {@link YahooWeather#turnCtoF(int)} and {@link YahooWeather#turnFtoC(int)}
+     */
 	public void setUnit(char unit) {
 		if (unit == 'f')
 			mUnit = unit;
@@ -92,6 +100,20 @@ public class YahooWeather implements LocationResult {
 	
 	public char getUnit() {
 		return mUnit;
+	}
+	
+	/**
+	 * Units for temperature (case sensitive) f: Fahrenheit c: Celsius.
+	 * Celsius in default.
+	 * @param unit {@link UNIT#FAHRENHEIT} or {@link UNIT#CELSIUS}
+	 */
+	public void setUnit(UNIT unit) {
+	    if (unit == UNIT.CELSIUS) {
+	        setUnit('c');
+	    }
+	    if (unit == UNIT.FAHRENHEIT) {
+	        setUnit('f');
+	    }
 	}
 
 	/**
@@ -232,6 +254,14 @@ public class YahooWeather implements LocationResult {
 		task.execute(new String[]{lat, lon});
 	}
 
+	public static int turnFtoC(int tempF) {
+		return (int) ((tempF - 32) * 5.0f / 9);
+	}
+	
+	public static int turnCtoF(int tempC) {
+	    return (int) (tempC * 9.0f / 5 + 32);
+	}
+
 	private String getWeatherString(Context context, String woeidNumber, char unit) {
 		YahooWeatherLog.d("query yahoo weather with WOEID number : " + woeidNumber);
 
@@ -351,7 +381,7 @@ public class YahooWeather implements LocationResult {
 							));
 			weatherInfo.setCurrentText(
 					currentConditionNode.getAttributes().getNamedItem("text").getNodeValue());
-			weatherInfo.setCurrentTempF(
+			weatherInfo.setCurrentTemp(
 					Integer.parseInt(
 							currentConditionNode.getAttributes().getNamedItem("temp").getNodeValue()
 							));
@@ -395,11 +425,11 @@ public class YahooWeather implements LocationResult {
 				forecast1ConditionNode.getAttributes().getNamedItem("date").getNodeValue());
 		forecastInfo.setForecastDay(
 				forecast1ConditionNode.getAttributes().getNamedItem("day").getNodeValue());
-		forecastInfo.setForecastTempHighF(
+		forecastInfo.setForecastTempHigh(
 				Integer.parseInt(
 						forecast1ConditionNode.getAttributes().getNamedItem("high").getNodeValue()
 						));
-		forecastInfo.setForecastTempLowF(
+		forecastInfo.setForecastTempLow(
 				Integer.parseInt(
 						forecast1ConditionNode.getAttributes().getNamedItem("low").getNodeValue()
 						));

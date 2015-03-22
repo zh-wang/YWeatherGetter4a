@@ -57,8 +57,11 @@ public class WeatherInfo {
 	 */
 	int mCurrentCode = 0;
 	String mCurrentText = "";
-	int mCurrentTempC = 0;
-	int mCurrentTempF = 0;
+	/** 
+	 * Default in Celsius
+	 * You can set it by {@link YahooWeather#setUnit(char)}
+	 */
+	int mCurrentTemp = 0;
 	String mCurrentConditionIconURL = "";
 	Bitmap mCurrentConditionIcon = null;
 	String mCurrentConditionDate = "";
@@ -159,18 +162,13 @@ public class WeatherInfo {
 		mCurrentCode = currentCode;
 		mCurrentConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + currentCode + ".gif";
 	}
-
-	public int getCurrentTempF() {
-		return mCurrentTempF;
+	
+	protected void setCurrentTemp(int currentTemp) {
+	    mCurrentTemp = currentTemp;
 	}
-
-	protected void setCurrentTempF(int currentTempF) {
-		mCurrentTempF = currentTempF;
-		mCurrentTempC = this.turnFtoC(currentTempF);
-	}
-
-	public int getCurrentTempC() {
-		return mCurrentTempC;
+	
+	public int getCurrentTemp() {
+		return mCurrentTemp;
 	}
 
 	public String getTitle() {
@@ -333,10 +331,6 @@ public class WeatherInfo {
 		mCurrentText = currentText;
 	}
 
-	protected void setCurrentTempC(int currentTempC) {
-		mCurrentTempC = currentTempC;
-	}
-
 	public String getCurrentConditionIconURL() {
 		return mCurrentConditionIconURL;
 	}
@@ -347,10 +341,6 @@ public class WeatherInfo {
 
 	protected void setCurrentConditionIcon(Bitmap mCurrentConditionIcon) {
 		this.mCurrentConditionIcon = mCurrentConditionIcon;
-	}
-
-	private int turnFtoC(int tempF) {
-		return (tempF - 32) * 5 / 9;
 	}
 
 	protected void setWOEIDneighborhood(String wOEIDneighborhood) {
@@ -389,10 +379,12 @@ public class WeatherInfo {
 		private String mForecastDay;
 		private String mForecastDate;
 		private int mForecastCode;
-		private int mForecastTempHighC;
-		private int mForecastTempLowC;
-		private int mForecastTempHighF;
-		private int mForecastTempLowF;
+		/** 
+		 * Default in Celsius
+		 * You can set it by {@link YahooWeather#setUnit(char)}
+		 */
+		private int mForecastTempHigh;
+		private int mForecastTempLow;
 		private String mForecastConditionIconURL;
 		private Bitmap mForecastConditionIcon;
 		private String mForecastText;
@@ -430,38 +422,20 @@ public class WeatherInfo {
 			mForecastConditionIconURL = "http://l.yimg.com/a/i/us/we/52/" + forecastCode + ".gif";
 		}
 
-		public int getForecastTempHighC() {
-			return mForecastTempHighC;
+		public int getForecastTempHigh() {
+			return mForecastTempHigh;
 		}
 
-		protected void setForecastTempHighC(int forecastTempHighC) {
-			mForecastTempHighC = forecastTempHighC;
+		protected void setForecastTempHigh(int forecastTempHigh) {
+			mForecastTempHigh = forecastTempHigh;
 		}
 
-		public int getForecastTempLowC() {
-			return mForecastTempLowC;
+		public int getForecastTempLow() {
+			return mForecastTempLow;
 		}
 
-		protected void setForecastTempLowC(int forecastTempLowC) {
-			mForecastTempLowC = forecastTempLowC;
-		}
-
-		public int getForecastTempHighF() {
-			return mForecastTempHighF;
-		}
-
-		protected void setForecastTempHighF(int forecastTempHighF) {
-			mForecastTempHighF = forecastTempHighF;
-			mForecastTempHighC = turnFtoC(forecastTempHighF);
-		}
-
-		public int getForecastTempLowF() {
-			return mForecastTempLowF;
-		}
-
-		protected void setForecastTempLowF(int forecastTempLowF) {
-			mForecastTempLowF = forecastTempLowF;
-			mForecastTempLowC = turnFtoC(forecastTempLowF);
+		protected void setForecastTempLow(int forecastTempLow) {
+			mForecastTempLow = forecastTempLow;
 		}
 
 		public String getForecastConditionIconURL() {

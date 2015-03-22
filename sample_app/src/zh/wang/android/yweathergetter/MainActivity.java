@@ -22,6 +22,7 @@ import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
+import zh.wang.android.apis.yweathergetter4a.YahooWeather.UNIT;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
 import zh.wang.android.yweathergetter.R;
 import android.app.Activity;
@@ -130,9 +131,8 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 			mTvWeather0.setText("====== CURRENT ======" + "\n" +
 					           "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
 							   "weather: " + weatherInfo.getCurrentText() + "\n" +
-						       "temperature in ºC: " + weatherInfo.getCurrentTempC() + "\n" +
-					           "temperature in ºF: " + weatherInfo.getCurrentTempF() + "\n" +
-						       "wind chill in ºF: " + weatherInfo.getWindChill() + "\n" +
+						       "temperature in ºC: " + weatherInfo.getCurrentTemp() + "\n" +
+						       "wind chill: " + weatherInfo.getWindChill() + "\n" +
 					           "wind direction: " + weatherInfo.getWindDirection() + "\n" +
 						       "wind speed: " + weatherInfo.getWindSpeed() + "\n" +
 					           "Humidity: " + weatherInfo.getAtmosphereHumidity() + "\n" +
@@ -150,10 +150,10 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 				tvWeather.setText("====== FORECAST " + (i+1) + " ======" + "\n" +
 				                   "date: " + forecastInfo.getForecastDate() + "\n" +
 				                   "weather: " + forecastInfo.getForecastText() + "\n" +
-						           "low  temperature in ºC: " + forecastInfo.getForecastTempLowC() + "\n" +
-				                   "high temperature in ºC: " + forecastInfo.getForecastTempHighC() + "\n" +
-						           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
-				                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
+						           "low  temperature in ºC: " + forecastInfo.getForecastTempLow() + "\n" +
+				                   "high temperature in ºC: " + forecastInfo.getForecastTempHigh() + "\n"
+//						           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
+//				                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
 						           );
 				final ImageView ivForecast = (ImageView) forecastInfoLayout.findViewById(R.id.imageview_forecast_info);
 				if (forecastInfo.getForecastConditionIcon() != null) {
@@ -200,12 +200,14 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 	
 	private void searchByGPS() {
 		mYahooWeather.setNeedDownloadIcons(true);
+		mYahooWeather.setUnit(UNIT.CELSIUS);
 		mYahooWeather.setSearchMode(SEARCH_MODE.GPS);
 		mYahooWeather.queryYahooWeatherByGPS(getApplicationContext(), this);
 	}
 	
 	private void searchByPlaceName(String location) {
 		mYahooWeather.setNeedDownloadIcons(true);
+		mYahooWeather.setUnit(UNIT.CELSIUS);
 		mYahooWeather.setSearchMode(SEARCH_MODE.PLACE_NAME);
 		mYahooWeather.queryYahooWeatherByPlaceName(getApplicationContext(), location, MainActivity.this);
 	}
