@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -169,19 +170,22 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
     @Override
     public void onFailConnection(final Exception e) {
         // TODO Auto-generated method stub
-        
+        setNoResultLayout();
+        Toast.makeText(getApplicationContext(), "Fail Connection", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onFailParsing(final Exception e) {
         // TODO Auto-generated method stub
-        
+        setNoResultLayout();
+        Toast.makeText(getApplicationContext(), "Fail Parsing", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onFailFindLocation(final Exception e) {
         // TODO Auto-generated method stub
-        
+        setNoResultLayout();
+        Toast.makeText(getApplicationContext(), "Fail Find Location", Toast.LENGTH_SHORT).show();
     }
 
 	private void setNormalLayout() {

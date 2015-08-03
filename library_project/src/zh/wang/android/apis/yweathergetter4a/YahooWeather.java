@@ -43,6 +43,7 @@ import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Handler;
 
 /**
  * A wrapper for accessing Yahoo weather informations. 
@@ -242,16 +243,16 @@ public class YahooWeather implements LocationResult {
 	}
 	
 	@Override
-	public void gotLocation(Location location) {
+	public void gotLocation(final Location location) {
 	    if (location == null) {
 	        if (mExceptionListener != null) mExceptionListener.onFailFindLocation(
 	                new Exception("Location cannot be found"));
 	        return;
 	    }
-		final String lat = String.valueOf(location.getLatitude());
-		final String lon = String.valueOf(location.getLongitude());
-		final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
-		task.execute(new String[]{lat, lon});
+	    final String lat = String.valueOf(location.getLatitude());
+	    final String lon = String.valueOf(location.getLongitude());
+	    final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
+	    task.execute(new String[]{lat, lon});
 	}
 
 	public static int turnFtoC(int tempF) {
