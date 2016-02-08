@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.SocketTimeoutException;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,6 +42,8 @@ import org.xml.sax.SAXException;
 import zh.wang.android.apis.yweathergetter4a.UserLocationUtils.LocationResult;
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -210,7 +213,7 @@ public class YahooWeather implements LocationResult {
 	 * @param lon A string of longitude value
 	 * @param result A {@link WeatherInfo} instance
 	 */
-	public void queryYahooWeatherByLatLon(final Context context, final String lat, final String lon, 
+	public void queryYahooWeatherByLatLon(final Context context, final Double lat, final Double lon, 
 			final YahooWeatherInfoListener result) {
 		YahooWeatherLog.d("query yahoo weather by lat lon");
 		mContext = context;
@@ -221,7 +224,7 @@ public class YahooWeather implements LocationResult {
         }
 		mWeatherInfoResult = result;
 		final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
-		task.execute(new String[]{lat, lon});
+		task.execute(new Double[]{lat, lon});
 	}
 	
 	/**
@@ -249,10 +252,10 @@ public class YahooWeather implements LocationResult {
 	                new Exception("Location cannot be found"));
 	        return;
 	    }
-	    final String lat = String.valueOf(location.getLatitude());
-	    final String lon = String.valueOf(location.getLongitude());
+	    final Double lat = location.getLatitude();
+	    final Double lon = location.getLongitude();
 	    final WeatherQueryByLatLonTask task = new WeatherQueryByLatLonTask();
-	    task.execute(new String[]{lat, lon});
+	    task.execute(new Double[]{lat, lon});
 	}
 
 	public static int turnFtoC(int tempF) {
@@ -261,6 +264,23 @@ public class YahooWeather implements LocationResult {
 	
 	public static int turnCtoF(int tempC) {
 	    return (int) (tempC * 9.0f / 5 + 32);
+	}
+	
+	public static String addressToPlaceName(final Address address) {
+	    String result = "";
+	    if (address.getLocality() != null) {
+	        result += address.getLocality();
+	        result += " ";
+	    }
+	    if (address.getAdminArea() != null) {
+	        result += address.getAdminArea();
+	        result += " ";
+	    }
+	    if (address.getCountryName() != null) {
+	        result += address.getCountryName();
+	        result += " ";
+	    }
+	    return result;
 	}
 
 	private String getWeatherString(Context context, String woeidNumber, char unit) {
@@ -467,25 +487,53 @@ public class YahooWeather implements LocationResult {
 		}
 	}
 
-	private class WeatherQueryByLatLonTask extends AsyncTask<String, Void, WeatherInfo> {
+	private class WeatherQueryByLatLonTask extends AsyncTask<Double, Void, WeatherInfo> {
 
         @Override
-		protected WeatherInfo doInBackground(String... params) {
+		protected WeatherInfo doInBackground(Double... params) {
 			if (params == null || params.length != 2) {
 				throw new IllegalArgumentException("Parameter of WeatherQueryByLatLonTask is illegal");
 			}
-			final String lat = params[0];
-			final String lon = params[1];
-			WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
-			mWoeidNumber = woeidUtils.getWOEID(mContext, lat, lon);
-			if (!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
-				String weatherString = getWeatherString(mContext, mWoeidNumber, mUnit);
-				Document weatherDoc = convertStringToDocument(mContext, weatherString);
-				WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc, woeidUtils.getWoeidInfo());
-				return weatherInfo;
-			} else {
-				return null;
+			final Double lat = params[0];
+			final Double lon = params[1];
+			// Get city name or place name
+			if (mContext != null) {
+                final Geocoder geocoder = new Geocoder(mContext);
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(lat.doubleValue(), lon.doubleValue(), 1);
+                    for (Address address : addresses) {
+                        YahooWeatherLog.d("latlon : " + lat + ", " + lon);
+                        int n = address.getMaxAddressLineIndex();
+                        for (int i = 0; i < n; i++) {
+                            YahooWeatherLog.d("address line : " + address.getAddressLine(i));
+                        }
+
+                        YahooWeatherLog.d("adminarea : " + address.getAdminArea());
+                        YahooWeatherLog.d("subAdminArea : " + address.getSubAdminArea());
+                        YahooWeatherLog.d("countryName : " + address.getCountryName());
+                        YahooWeatherLog.d("feature name : " + address.getFeatureName());
+                        YahooWeatherLog.d("locality : " + address.getLocality());
+                        YahooWeatherLog.d("sublocality : " + address.getSubLocality());
+                        YahooWeatherLog.d("postCode : " + address.getPostalCode());
+                        YahooWeatherLog.d("premises : " + address.getPremises());
+                        YahooWeatherLog.d("thoroughfare : " + address.getThoroughfare());
+
+                        WOEIDUtils woeidUtils = WOEIDUtils.getInstance();
+                        mWoeidNumber = woeidUtils.getWOEID(mContext, YahooWeather.addressToPlaceName(address));
+                        if(!mWoeidNumber.equals(WOEIDUtils.WOEID_NOT_FOUND)) {
+                            String weatherString = getWeatherString(mContext, mWoeidNumber, mUnit);
+                            Document weatherDoc = convertStringToDocument(mContext, weatherString);
+                            WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc, woeidUtils.getWoeidInfo());
+                            weatherInfo.setAddress(address);
+                            return weatherInfo;
+                        }
+                    }
+
+                } catch (IOException e) {
+                    YahooWeatherLog.printStack(e);
+                }
 			}
+            return null;
 		}
 
 		@Override

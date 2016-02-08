@@ -50,6 +50,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 	private EditText mEtAreaOfCity;
 	private Button mBtSearch;
 	private Button mBtGPS;
+	private LinearLayout mCurrentWeatherInfoLayout;
 	private LinearLayout mWeatherInfosLayout;
 
 	private YahooWeather mYahooWeather = YahooWeather.getInstance(5000, 5000, true);
@@ -65,12 +66,12 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
         
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.show();
         
     	mTvTitle = (TextView) findViewById(R.id.textview_title);
 		mTvWeather0 = (TextView) findViewById(R.id.textview_weather_info_0);
 		mTvErrorMessage = (TextView) findViewById(R.id.textview_error_message);
 		mIvWeather0 = (ImageView) findViewById(R.id.imageview_weather_info_0);
+		mCurrentWeatherInfoLayout = (LinearLayout) findViewById(R.id.current_weather_info);
         
         mEtAreaOfCity = (EditText) findViewById(R.id.edittext_area);
         
@@ -101,8 +102,8 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 		});
 
         mWeatherInfosLayout = (LinearLayout) findViewById(R.id.weather_infos);
-     
-        searchByGPS();
+        
+        this.searchByGPS();
     }
     
 	@Override
@@ -120,7 +121,9 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
         if (weatherInfo != null) {
         	setNormalLayout();
         	if (mYahooWeather.getSearchMode() == SEARCH_MODE.GPS) {
-        		mEtAreaOfCity.setText("YOUR CURRENT LOCATION");
+        	    if (weatherInfo.getAddress() != null) {
+        	        mEtAreaOfCity.setText(YahooWeather.addressToPlaceName(weatherInfo.getAddress()));
+        	    }
         	}
         	mWeatherInfosLayout.removeAllViews();
 			mTvTitle.setText(
@@ -189,14 +192,17 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
     }
 
 	private void setNormalLayout() {
-		mWeatherInfosLayout.setVisibility(View.VISIBLE);
 		mTvTitle.setVisibility(View.VISIBLE);
+		mCurrentWeatherInfoLayout.setVisibility(View.VISIBLE);
+		mWeatherInfosLayout.setVisibility(View.VISIBLE);
 		mTvErrorMessage.setVisibility(View.INVISIBLE);
 	}
 	
 	private void setNoResultLayout() {
 		mTvTitle.setVisibility(View.INVISIBLE);
+        mWeatherInfosLayout.removeAllViews();
 		mWeatherInfosLayout.setVisibility(View.INVISIBLE);
+		mCurrentWeatherInfoLayout.setVisibility(View.INVISIBLE);
 		mTvErrorMessage.setVisibility(View.VISIBLE);
 		mTvErrorMessage.setText("Sorry, no result returned");
 	    mProgressDialog.cancel();

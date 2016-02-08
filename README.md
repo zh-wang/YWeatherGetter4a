@@ -24,9 +24,10 @@ https://developer.yahoo.com/weather/documentation.html#response
 
   This is a wrapper for getting weather information from Yahoo Weather RSS Feed.  
   You can find its guideline here.  [Yahoo Weather RSS Feed](https://developer.yahoo.com/weather/).  
-  Note that, if you want to use weather API for commercial purpose, you should contact Yahoo's staff first.  
+  Note that, if you want to use weather API for commercial purpose, you should contact Yahoo first.  
 
 + How do I use it?
+   * __(from 2016/02) Because Yahoo has stopped free GPS position to WOEID service, YWeatherGetter4a now uses Android's `Geocoder` to fetch place name for a specific GPS position, then query Yahoo Weather api with it. Therefore, the result now may be somehow different now.__
 
    * First, implement YahooWeatherInfoListener in your Activity. Overwrite the callback function "gotWeatherInfo", which will be called after querying from Yahoo weather API. And, you need `INTERNET` and `ACCESS_NETWORK_STATE` to use `YWeatherGetter4a`.
 
@@ -51,18 +52,20 @@ https://developer.yahoo.com/weather/documentation.html#response
       ```java
       public void queryYahooWeatherByLatLon(final Context context, final String lat, final String lon, final YahooWeatherInfoListener result) 
       ```
-      
+
       3. Use device's gps to detect current location. Then do the query. Remeber, you need ` ACCESS_FINE_LOCATION ` or ` ACCESS_COARSE_LOCATION ` to use this.  
       ```java
       public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) 
       ```
 
-      4. You can set connect timeout and socket timeout by `setConnectTimeout` and `setSocketTimeout`. Or get the instance by `getInstance(int connectTimeout, int socketTimeout)`.   
+      4. You can set connect timeout and socket timeout by `setConnectTimeout` and `setSocketTimeout`. Or get the instance by `getInstance(int connectTimeout, int socketTimeout)`.
 
       5. Handle exception by using `setExceptionListener`.
 
+  * If you use GPS position for query, the result `WeatherInfo` will contains an `Address` object, which is the detail address object return from `Geocoder`. It contains a lot of information but this lib only use `locality`, `adminArea`, and `countryName` by default. See `YahooWeather.addressToPlaceName` and [Geocoder](http://developer.android.com/intl/ja/reference/android/location/Address.html) for details.
+
 + What kind of weather information can I get?
-  You can get 
+  You can get
   * current condition of weather, humidity, wind, etc.
   * forecast information for next four days.
 
@@ -72,7 +75,7 @@ Zhenghong Wang - <viennakanon@gmail.com>
 
 License
 ================
-    Copyright 2014 Zhenghong Wang
+    Copyright 2016 Zhenghong Wang
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

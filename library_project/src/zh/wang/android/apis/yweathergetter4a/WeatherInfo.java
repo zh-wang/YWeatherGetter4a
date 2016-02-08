@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.Bitmap;
+import android.location.Address;
 
 /**
  * A wrapper for all weather information provided by Yahoo weather apis.
@@ -88,6 +89,8 @@ public class WeatherInfo {
 	String mWOEIDCounty = "";
 	String mWOEIDCountry = "";
 	String mWOEIDState = "";
+	
+	Address mAddress = null;
 	
 	public WeatherInfo() {
 		mForecastInfoList = new ArrayList<WeatherInfo.ForecastInfo>();
@@ -373,6 +376,14 @@ public class WeatherInfo {
 
     public String getWOEIDState() {
         return mWOEIDState;
+    }
+    
+    public Address getAddress() {
+        return mAddress;
+    }
+    
+    public void setAddress(Address address) {
+        mAddress = address;
     }
 
     public class ForecastInfo {

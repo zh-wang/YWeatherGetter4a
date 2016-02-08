@@ -24,6 +24,7 @@ class UserLocationUtils {
     private boolean mGpsEnabled = false;
     private boolean mNetworkEnabled = false;
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private GetLastLocation mGetLastLocationTask; 
 
     public boolean findUserLocation(Context context, LocationResult result)
     {
@@ -43,7 +44,8 @@ class UserLocationUtils {
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListenerGps);
         if(mNetworkEnabled)
             mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListenerNetwork);
-        mHandler.postDelayed(new GetLastLocation(), 20000);
+        mGetLastLocationTask = new GetLastLocation();
+        mHandler.postDelayed(mGetLastLocationTask, 20000);
         return true;
     }
 
@@ -53,6 +55,10 @@ class UserLocationUtils {
             mLocationResult.gotLocation(location);
             mLocationManager.removeUpdates(this);
             mLocationManager.removeUpdates(locationListenerNetwork);
+            if (mGetLastLocationTask != null) {
+                mHandler.removeCallbacks(mGetLastLocationTask);
+                mGetLastLocationTask = null;
+            }
         }
         public void onProviderDisabled(String provider) {}
         public void onProviderEnabled(String provider) {}
@@ -65,6 +71,10 @@ class UserLocationUtils {
             mLocationResult.gotLocation(location);
             mLocationManager.removeUpdates(this);
             mLocationManager.removeUpdates(locationListenerGps);
+            if (mGetLastLocationTask != null) {
+                mHandler.removeCallbacks(mGetLastLocationTask);
+                mGetLastLocationTask = null;
+            }
         }
         public void onProviderDisabled(String provider) {}
         public void onProviderEnabled(String provider) {}
