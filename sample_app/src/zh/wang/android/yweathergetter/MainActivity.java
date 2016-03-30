@@ -127,12 +127,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
         	    }
         	}
         	mWeatherInfosLayout.removeAllViews();
-			mTvTitle.setText(
-			        weatherInfo.getTitle() + "\n"
-					+ weatherInfo.getWOEIDneighborhood() + ", "
-					+ weatherInfo.getWOEIDCounty() + ", "
-					+ weatherInfo.getWOEIDState() + ", " 
-					+ weatherInfo.getWOEIDCountry());
+			mTvTitle.setText(weatherInfo.getTitle());
 			mTvWeather0.setText("====== CURRENT ======" + "\n" +
 					           "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
 							   "weather: " + weatherInfo.getCurrentText() + "\n" +

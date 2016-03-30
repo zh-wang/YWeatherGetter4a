@@ -27,7 +27,6 @@ https://developer.yahoo.com/weather/documentation.html#response
   Note that, if you want to use weather API for commercial purpose, you should contact Yahoo first.  
 
 + How do I use it?
-   * __(from 2016/02) Because Yahoo has stopped free GPS position to WOEID service, YWeatherGetter4a now uses Android's `Geocoder` to fetch place name for a specific GPS position, then query Yahoo Weather api with it. Therefore, the result now may be somehow different now.__
 
    * First, implement YahooWeatherInfoListener in your Activity. Overwrite the callback function "gotWeatherInfo", which will be called after querying from Yahoo weather API. And, you need `INTERNET` and `ACCESS_NETWORK_STATE` to use `YWeatherGetter4a`.
 

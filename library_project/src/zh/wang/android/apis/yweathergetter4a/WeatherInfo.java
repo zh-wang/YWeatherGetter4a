@@ -17,11 +17,11 @@
 
 package zh.wang.android.apis.yweathergetter4a;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.graphics.Bitmap;
 import android.location.Address;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A wrapper for all weather information provided by Yahoo weather apis.
@@ -81,15 +81,7 @@ public class WeatherInfo {
 	ForecastInfo mForecastInfo4 = new ForecastInfo();
 	ForecastInfo mForecastInfo5 = new ForecastInfo();
 	private List<ForecastInfo> mForecastInfoList = null;
-	
-	/*
-	 * detail location info from woeid result
-	 */
-	String mWOEIDneighborhood = "";
-	String mWOEIDCounty = "";
-	String mWOEIDCountry = "";
-	String mWOEIDState = "";
-	
+
 	Address mAddress = null;
 	
 	public WeatherInfo() {
@@ -346,38 +338,6 @@ public class WeatherInfo {
 		this.mCurrentConditionIcon = mCurrentConditionIcon;
 	}
 
-	protected void setWOEIDneighborhood(String wOEIDneighborhood) {
-        mWOEIDneighborhood = wOEIDneighborhood;
-    }
-
-    protected void setWOEIDCounty(String wOEIDCounty) {
-        mWOEIDCounty = wOEIDCounty;
-    }
-
-    protected void setWOEIDCountry(String wOEIDCountry) {
-        mWOEIDCountry = wOEIDCountry;
-    }
-
-    protected void setWOEIDState(String wOEIDState) {
-        mWOEIDState = wOEIDState;
-    }
-
-    public String getWOEIDneighborhood() {
-        return mWOEIDneighborhood;
-    }
-
-    public String getWOEIDCounty() {
-        return mWOEIDCounty;
-    }
-
-    public String getWOEIDCountry() {
-        return mWOEIDCountry;
-    }
-
-    public String getWOEIDState() {
-        return mWOEIDState;
-    }
-    
     public Address getAddress() {
         return mAddress;
     }
