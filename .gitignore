@@ -26,3 +26,16 @@ local.properties
 
 # DS file
 .DS_Store
+
+.classpath
+.project
+proguard/
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/libraries/
+.gradle
+app/build/
+.DS_Store

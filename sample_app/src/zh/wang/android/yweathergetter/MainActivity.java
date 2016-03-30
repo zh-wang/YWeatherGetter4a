@@ -17,19 +17,10 @@
 
 package zh.wang.android.yweathergetter;
 
-import zh.wang.android.apis.yweathergetter4a.WeatherInfo;
-import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
-import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
-import zh.wang.android.apis.yweathergetter4a.YahooWeather;
-import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
-import zh.wang.android.apis.yweathergetter4a.YahooWeather.UNIT;
-import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
-import zh.wang.android.yweathergetter.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -39,6 +30,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import zh.wang.android.apis.yweathergetter4a.WeatherInfo;
+import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
+import zh.wang.android.apis.yweathergetter4a.YahooWeather;
+import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
+import zh.wang.android.apis.yweathergetter4a.YahooWeather.UNIT;
+import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
+import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
 
 public class MainActivity extends Activity implements YahooWeatherInfoListener,
     YahooWeatherExceptionListener {
@@ -79,6 +78,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
         mBtSearch.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				mWeatherInfosLayout.removeAllViews();
 				String _location = mEtAreaOfCity.getText().toString();
 				if (!TextUtils.isEmpty(_location)) {
 					InputMethodManager imm = (InputMethodManager)getSystemService(
@@ -87,7 +87,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 	                searchByPlaceName(_location);	
 	                showProgressDialog();
 				} else {
-					Toast.makeText(getApplicationContext(), "location is not inputted", 1).show();
+					Toast.makeText(getApplicationContext(), "location is not inputted", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -96,6 +96,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
         mBtGPS.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				mWeatherInfosLayout.removeAllViews();
 				searchByGPS();
 				showProgressDialog();
 			}
