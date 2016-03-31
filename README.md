@@ -16,7 +16,7 @@ Request and response elements are defined here.
 [https://developer.yahoo.com/weather/documentation.html#response](https://developer.yahoo.com/weather/documentation.html#response)
 
 Check the XML structure returned by Yahoo Weather API here.  
-[http://weather.yahooapis.com/forecastrss?w=2459115](http://weather.yahooapis.com/forecastrss?w=2459115)
+[Sample Weather API Response - Shanghai](https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22Shanghai%22))
 
 https://developer.yahoo.com/weather/documentation.html#response
 
