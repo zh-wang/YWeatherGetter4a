@@ -521,7 +521,8 @@ public class YahooWeather implements LocationResult {
                         String weatherString = getWeatherString(mContext, addressToPlaceName(address));
                         Document weatherDoc = convertStringToDocument(mContext, weatherString);
                         WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
-                        weatherInfo.setAddress(address);
+                        if(weatherInfo != null)
+                        	weatherInfo.setAddress(address);
                         return weatherInfo;
                     }
 
