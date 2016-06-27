@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
         setContentView(R.layout.main_activity_layout);
         
         mYahooWeather.setExceptionListener(this);
-        
+
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         
@@ -152,8 +152,6 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 				                   "weather: " + forecastInfo.getForecastText() + "\n" +
 						           "low  temperature in ºC: " + forecastInfo.getForecastTempLow() + "\n" +
 				                   "high temperature in ºC: " + forecastInfo.getForecastTempHigh() + "\n"
-//						           "low  temperature in ºF: " + forecastInfo.getForecastTempLowF() + "\n" +
-//				                   "high temperature in ºF: " + forecastInfo.getForecastTempHighF() + "\n"
 						           );
 				final ImageView ivForecast = (ImageView) forecastInfoLayout.findViewById(R.id.imageview_forecast_info);
 				if (forecastInfo.getForecastConditionIcon() != null) {
