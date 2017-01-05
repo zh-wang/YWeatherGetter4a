@@ -32,15 +32,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo;
-import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather.SEARCH_MODE;
 import zh.wang.android.apis.yweathergetter4a.YahooWeather.UNIT;
-import zh.wang.android.apis.yweathergetter4a.YahooWeatherExceptionListener;
 import zh.wang.android.apis.yweathergetter4a.YahooWeatherInfoListener;
 
-public class MainActivity extends Activity implements YahooWeatherInfoListener,
-    YahooWeatherExceptionListener {
+public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	
 	private ImageView mIvWeather0;
 	private TextView mTvWeather0;
@@ -60,8 +57,6 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
-        
-        mYahooWeather.setExceptionListener(this);
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -116,74 +111,60 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 	}
 
 	@Override
-	public void gotWeatherInfo(WeatherInfo weatherInfo) {
+	public void gotWeatherInfo(final WeatherInfo weatherInfo, YahooWeather.ErrorType errorType) {
 		// TODO Auto-generated method stub
-		hideProgressDialog();
+        hideProgressDialog();
         if (weatherInfo != null) {
-        	setNormalLayout();
-        	if (mYahooWeather.getSearchMode() == SEARCH_MODE.GPS) {
-        	    if (weatherInfo.getAddress() != null) {
-        	        mEtAreaOfCity.setText(YahooWeather.addressToPlaceName(weatherInfo.getAddress()));
-        	    }
-        	}
-        	mWeatherInfosLayout.removeAllViews();
-			mTvTitle.setText(weatherInfo.getTitle());
-			mTvWeather0.setText("====== CURRENT ======" + "\n" +
-					           "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
-							   "weather: " + weatherInfo.getCurrentText() + "\n" +
-						       "temperature in ºC: " + weatherInfo.getCurrentTemp() + "\n" +
-						       "wind chill: " + weatherInfo.getWindChill() + "\n" +
-					           "wind direction: " + weatherInfo.getWindDirection() + "\n" +
-						       "wind speed: " + weatherInfo.getWindSpeed() + "\n" +
-					           "Humidity: " + weatherInfo.getAtmosphereHumidity() + "\n" +
-						       "Pressure: " + weatherInfo.getAtmospherePressure() + "\n" +
-					           "Visibility: " + weatherInfo.getAtmosphereVisibility()
-					           );
-			if (weatherInfo.getCurrentConditionIcon() != null) {
-				mIvWeather0.setImageBitmap(weatherInfo.getCurrentConditionIcon());
-			}
-			for (int i = 0; i < YahooWeather.FORECAST_INFO_MAX_SIZE; i++) {
-				final LinearLayout forecastInfoLayout = (LinearLayout) 
-						getLayoutInflater().inflate(R.layout.forecastinfo, null);
-				final TextView tvWeather = (TextView) forecastInfoLayout.findViewById(R.id.textview_forecast_info);
-				final ForecastInfo forecastInfo = weatherInfo.getForecastInfoList().get(i);
-				tvWeather.setText("====== FORECAST " + (i+1) + " ======" + "\n" +
-				                   "date: " + forecastInfo.getForecastDate() + "\n" +
-				                   "weather: " + forecastInfo.getForecastText() + "\n" +
-						           "low  temperature in ºC: " + forecastInfo.getForecastTempLow() + "\n" +
-				                   "high temperature in ºC: " + forecastInfo.getForecastTempHigh() + "\n"
-						           );
-				final ImageView ivForecast = (ImageView) forecastInfoLayout.findViewById(R.id.imageview_forecast_info);
-				if (forecastInfo.getForecastConditionIcon() != null) {
-					ivForecast.setImageBitmap(forecastInfo.getForecastConditionIcon());
-				}
-				mWeatherInfosLayout.addView(forecastInfoLayout);
-			}
+            setNormalLayout();
+            if (mYahooWeather.getSearchMode() == SEARCH_MODE.GPS) {
+                if (weatherInfo.getAddress() != null) {
+                    mEtAreaOfCity.setText(YahooWeather.addressToPlaceName(weatherInfo.getAddress()));
+                }
+            }
+            mWeatherInfosLayout.removeAllViews();
+            mTvTitle.setText(weatherInfo.getTitle());
+            mTvWeather0.setText("====== CURRENT ======" + "\n" +
+                    "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
+                    "weather: " + weatherInfo.getCurrentText() + "\n" +
+                    "temperature in ºC: " + weatherInfo.getCurrentTemp() + "\n" +
+                    "wind chill: " + weatherInfo.getWindChill() + "\n" +
+                    "wind direction: " + weatherInfo.getWindDirection() + "\n" +
+                    "wind speed: " + weatherInfo.getWindSpeed() + "\n" +
+                    "Humidity: " + weatherInfo.getAtmosphereHumidity() + "\n" +
+                    "Pressure: " + weatherInfo.getAtmospherePressure() + "\n" +
+                    "Visibility: " + weatherInfo.getAtmosphereVisibility()
+            );
+            if (weatherInfo.getCurrentConditionIcon() != null) {
+                mIvWeather0.setImageBitmap(weatherInfo.getCurrentConditionIcon());
+            }
+            for (int i = 0; i < YahooWeather.FORECAST_INFO_MAX_SIZE; i++) {
+                final LinearLayout forecastInfoLayout = (LinearLayout)
+                        getLayoutInflater().inflate(R.layout.forecastinfo, null);
+                final TextView tvWeather = (TextView) forecastInfoLayout.findViewById(R.id.textview_forecast_info);
+                final WeatherInfo.ForecastInfo forecastInfo = weatherInfo.getForecastInfoList().get(i);
+                tvWeather.setText("====== FORECAST " + (i+1) + " ======" + "\n" +
+                        "date: " + forecastInfo.getForecastDate() + "\n" +
+                        "weather: " + forecastInfo.getForecastText() + "\n" +
+                        "low  temperature in ºC: " + forecastInfo.getForecastTempLow() + "\n" +
+                        "high temperature in ºC: " + forecastInfo.getForecastTempHigh() + "\n"
+                );
+                final ImageView ivForecast = (ImageView) forecastInfoLayout.findViewById(R.id.imageview_forecast_info);
+                if (forecastInfo.getForecastConditionIcon() != null) {
+                    ivForecast.setImageBitmap(forecastInfo.getForecastConditionIcon());
+                }
+                mWeatherInfosLayout.addView(forecastInfoLayout);
+            }
         } else {
-        	setNoResultLayout();
+            switch (errorType) {
+                case ConnectionFailed:
+                    setNoResultLayout("ConnectionFailed");
+                case ParsingFailed:
+                    setNoResultLayout("ParsingFailed");
+                case NoLocationFound:
+                    setNoResultLayout("NoLocationFound");
+            }
         }
 	}
-
-    @Override
-    public void onFailConnection(final Exception e) {
-        // TODO Auto-generated method stub
-        setNoResultLayout();
-        Toast.makeText(getApplicationContext(), "Fail Connection", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onFailParsing(final Exception e) {
-        // TODO Auto-generated method stub
-        setNoResultLayout();
-        Toast.makeText(getApplicationContext(), "Fail Parsing", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onFailFindLocation(final Exception e) {
-        // TODO Auto-generated method stub
-        setNoResultLayout();
-        Toast.makeText(getApplicationContext(), "Fail Find Location", Toast.LENGTH_SHORT).show();
-    }
 
 	private void setNormalLayout() {
 		mTvTitle.setVisibility(View.VISIBLE);
@@ -192,13 +173,13 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener,
 		mTvErrorMessage.setVisibility(View.INVISIBLE);
 	}
 	
-	private void setNoResultLayout() {
+	private void setNoResultLayout(String errorMsg) {
 		mTvTitle.setVisibility(View.INVISIBLE);
         mWeatherInfosLayout.removeAllViews();
 		mWeatherInfosLayout.setVisibility(View.INVISIBLE);
 		mCurrentWeatherInfoLayout.setVisibility(View.INVISIBLE);
 		mTvErrorMessage.setVisibility(View.VISIBLE);
-		mTvErrorMessage.setText("Sorry, no result returned");
+		mTvErrorMessage.setText("Sorry, no result returned\n" + errorMsg);
 	    mProgressDialog.cancel();
 	}
 	

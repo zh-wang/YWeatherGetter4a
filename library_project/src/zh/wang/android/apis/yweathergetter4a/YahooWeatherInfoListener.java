@@ -22,5 +22,5 @@ package zh.wang.android.apis.yweathergetter4a;
  * @author Zhenghong Wang
  */
 public interface YahooWeatherInfoListener {
-	public void gotWeatherInfo(WeatherInfo weatherInfo);
+	public void gotWeatherInfo(WeatherInfo weatherInfo, YahooWeather.ErrorType errorType);
 }

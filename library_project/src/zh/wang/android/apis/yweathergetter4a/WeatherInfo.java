@@ -28,7 +28,7 @@ import java.util.List;
  * @author Zhenghong Wang
  */
 public class WeatherInfo {
-	
+
 	String mTitle = "";
 	String mDescription = "";
 	String mLanguage = "";

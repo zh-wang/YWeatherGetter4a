@@ -23,16 +23,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.SocketTimeoutException;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -43,9 +33,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.SocketTimeoutException;
+import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import zh.wang.android.apis.yweathergetter4a.UserLocationUtils.LocationResult;
 import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
 
@@ -54,6 +54,14 @@ import zh.wang.android.apis.yweathergetter4a.WeatherInfo.ForecastInfo;
  * @author Zhenghong Wang
  */
 public class YahooWeather implements LocationResult {
+
+    public enum ErrorType {
+        ConnectionFailed,
+        NoLocationFound,
+        ParsingFailed,
+    }
+
+    ErrorType mErrorType = null;
 
     private static final String YQL_WEATHER_ENDPOINT_AUTHORITY = "query.yahooapis.com";
     private static final String YQL_WEATHER_ENDPOINT_PATH = "/v1/public/yql";
@@ -77,10 +85,9 @@ public class YahooWeather implements LocationResult {
 	
 	private String mWoeidNumber;
 	private YahooWeatherInfoListener mWeatherInfoResult;
-	private YahooWeatherExceptionListener mExceptionListener;
 	private boolean mNeedDownloadIcons;
 	private SEARCH_MODE mSearchMode;
-	
+
 	// Use Metric units by default
 	private UNIT mUnit = UNIT.CELSIUS;
 	
@@ -153,18 +160,7 @@ public class YahooWeather implements LocationResult {
 	public void setNeedDownloadIcons(final boolean needDownloadIcons) {
 		mNeedDownloadIcons = needDownloadIcons;
 	}
-	
-	/**
-	 * Set exception listener. 
-	 * If this is not set, stack info will be printed in logcat if 'isDebuggable' is set to true.
-	 * Remember, these methodas may be called on background thread. Therefore, any UI related
-	 * activities must be post to UI thread, using {@link Handler} or something else.
-	 * @param exceptionListener
-	 */
-	public void setExceptionListener(final YahooWeatherExceptionListener exceptionListener) {
-	    this.mExceptionListener = exceptionListener;
-	}
-	
+
 	/**
 	 * Use a name of place to query Yahoo weather apis for weather information. 
 	 * Querying will be run on a separated thread to accessing Yahoo's apis.
@@ -181,8 +177,7 @@ public class YahooWeather implements LocationResult {
 		YahooWeatherLog.d("query yahoo weather by name of place");
 		mContext = context;
         if (!NetworkUtils.isConnected(context)) {
-            if (mExceptionListener != null) mExceptionListener.onFailConnection(
-                    new Exception("Network is not avaiable"));
+            mErrorType = ErrorType.ConnectionFailed;
         	return;
         }
         final String convertedlocation = AsciiUtils.convertNonAscii(cityAreaOrLocation);
@@ -206,8 +201,7 @@ public class YahooWeather implements LocationResult {
 		YahooWeatherLog.d("query yahoo weather by lat lon");
 		mContext = context;
         if (!NetworkUtils.isConnected(context)) {
-            if (mExceptionListener != null) mExceptionListener.onFailConnection(
-                    new Exception("Network is not avaiable"));
+            mErrorType = ErrorType.ConnectionFailed;
         	return;
         }
 		mWeatherInfoResult = result;
@@ -224,8 +218,7 @@ public class YahooWeather implements LocationResult {
 	public void queryYahooWeatherByGPS(final Context context, final YahooWeatherInfoListener result) {
 		YahooWeatherLog.d("query yahoo weather by gps");
         if (!NetworkUtils.isConnected(context)) {
-            if (mExceptionListener != null) mExceptionListener.onFailConnection(
-                    new Exception("Network is not avaiable"));
+            mErrorType = ErrorType.ConnectionFailed;
         	return;
         }
 		mContext = context;
@@ -236,8 +229,7 @@ public class YahooWeather implements LocationResult {
 	@Override
 	public void gotLocation(final Location location) {
 	    if (location == null) {
-	        if (mExceptionListener != null) mExceptionListener.onFailFindLocation(
-                    new Exception("Location cannot be found"));
+            mErrorType = ErrorType.NoLocationFound;
 	        return;
 	    }
 	    final Double lat = location.getLatitude();
@@ -313,16 +305,16 @@ public class YahooWeather implements LocationResult {
 
         } catch (ClientProtocolException e) {
             YahooWeatherLog.printStack(e);
-            if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
+            mErrorType = ErrorType.ConnectionFailed;
         } catch (ConnectTimeoutException e) {
             YahooWeatherLog.printStack(e);
-            if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
+            mErrorType = ErrorType.ConnectionFailed;
         } catch (SocketTimeoutException e) {
             YahooWeatherLog.printStack(e);
-            if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
+            mErrorType = ErrorType.ConnectionFailed;
         } catch (IOException e) {
             YahooWeatherLog.printStack(e);
-            if (mExceptionListener != null) mExceptionListener.onFailConnection(e);
+            mErrorType = ErrorType.ConnectionFailed;
         } finally {
             httpClient.getConnectionManager().shutdown();
         }
@@ -331,6 +323,8 @@ public class YahooWeather implements LocationResult {
     }
 
 	private Document convertStringToDocument(Context context, String src) {
+		if (src.length() == 0) return null;
+
 		Document dest = null;
 
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -341,19 +335,20 @@ public class YahooWeather implements LocationResult {
 			dest = parser.parse(new ByteArrayInputStream(src.getBytes()));
 		} catch (ParserConfigurationException e) {
 			YahooWeatherLog.printStack(e);
-			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
+            mErrorType = ErrorType.ParsingFailed;
 		} catch (SAXException e) {
 			YahooWeatherLog.printStack(e);
-			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
+            mErrorType = ErrorType.ParsingFailed;
 		} catch (IOException e) {
 			YahooWeatherLog.printStack(e);
-			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
+            mErrorType = ErrorType.ParsingFailed;
 		}
 
 		return dest;
 	}
 	
 	private WeatherInfo parseWeatherInfo(Context context, Document doc) {
+        if (doc == null) return null;
 		WeatherInfo weatherInfo = new WeatherInfo();
 		try {
 			
@@ -416,7 +411,7 @@ public class YahooWeather implements LocationResult {
 
 		} catch (NullPointerException e) {
 		    YahooWeatherLog.printStack(e);
-			if (mExceptionListener != null) mExceptionListener.onFailParsing(e);
+            mErrorType = ErrorType.ParsingFailed;
 			weatherInfo = null;
 		}
 		
@@ -461,9 +456,8 @@ public class YahooWeather implements LocationResult {
 
 		@Override
 		protected void onPostExecute(WeatherInfo result) {
-			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			mWeatherInfoResult.gotWeatherInfo(result);
+			mWeatherInfoResult.gotWeatherInfo(result, mErrorType);
 			mContext = null;
 		}
 	}
@@ -518,7 +512,7 @@ public class YahooWeather implements LocationResult {
 		@Override
 		protected void onPostExecute(WeatherInfo result) {
 			super.onPostExecute(result);
-			mWeatherInfoResult.gotWeatherInfo(result);
+			mWeatherInfoResult.gotWeatherInfo(result, mErrorType);
 			mContext = null;
 		}
 	}

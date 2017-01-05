@@ -32,10 +32,20 @@ https://developer.yahoo.com/weather/documentation.html#response
 
     ```java
     @Override
-    public void gotWeatherInfo(WeatherInfo weatherInfo) {
+    public void gotWeatherInfo(WeatherInfo weatherInfo, YahooWeather.ErrorType errorType) {
         if(weatherInfo != null) {
             // Add your code here
             // weatherInfo object contains all information returned by Yahoo Weather apis
+
+            // if `weatherInfo` is null, you can get the error from `errorType`
+                        switch (errorType) {
+                case ConnectionFailed:
+
+                case ParsingFailed:
+
+                case NoLocationFound:
+
+            }
         }
     }
     ```
@@ -58,8 +68,6 @@ https://developer.yahoo.com/weather/documentation.html#response
       ```
 
       4. You can set connect timeout and socket timeout by `setConnectTimeout` and `setSocketTimeout`. Or get the instance by `getInstance(int connectTimeout, int socketTimeout)`.
-
-      5. Handle exception by using `setExceptionListener`.
 
   * If you use GPS position for query, the result `WeatherInfo` will contains an `Address` object, which is the detail address object return from `Geocoder`. It contains a lot of information but this lib only use `locality`, `adminArea`, and `countryName` by default. See `YahooWeather.addressToPlaceName` and [Geocoder](http://developer.android.com/intl/ja/reference/android/location/Address.html) for details.
 
