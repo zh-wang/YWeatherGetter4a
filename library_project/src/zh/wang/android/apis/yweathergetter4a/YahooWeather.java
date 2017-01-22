@@ -24,22 +24,20 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -147,8 +145,6 @@ public class YahooWeather implements LocationResult {
 	 */
 	public static YahooWeather getInstance(int connectTimeout, int socketTimeout, boolean isDebuggable) {
 	    YahooWeatherLog.setDebuggable(isDebuggable);
-	    NetworkUtils.getInstance().setConnectTimeout(connectTimeout);
-	    NetworkUtils.getInstance().setSocketTimeout(socketTimeout);
 		return mInstance;
 	}
 	
@@ -285,38 +281,23 @@ public class YahooWeather implements LocationResult {
         HttpGet httpGet = new HttpGet(queryUrl);
 
         try {
-            HttpEntity httpEntity = httpClient.execute(httpGet).getEntity();
-
-            if (httpEntity != null) {
-                InputStream inputStream = httpEntity.getContent();
-                Reader in = new InputStreamReader(inputStream);
-                BufferedReader bufferedreader = new BufferedReader(in);
-                StringBuilder stringBuilder = new StringBuilder();
-
-                String readLine = null;
-
-                while ((readLine = bufferedreader.readLine()) != null) {
-                    YahooWeatherLog.d(readLine);
-                    stringBuilder.append(readLine + "\n");
+            URL url = new URL(queryUrl);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            InputStream content = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
+            String currLine = "";
+            try {
+            while ((currLine = buffer.readLine()) != null) {
+                    qResult += currLine;
                 }
-
-                qResult = stringBuilder.toString();
             }
-
-        } catch (ClientProtocolException e) {
-            YahooWeatherLog.printStack(e);
-            mErrorType = ErrorType.ConnectionFailed;
-        } catch (ConnectTimeoutException e) {
-            YahooWeatherLog.printStack(e);
-            mErrorType = ErrorType.ConnectionFailed;
-        } catch (SocketTimeoutException e) {
-            YahooWeatherLog.printStack(e);
-            mErrorType = ErrorType.ConnectionFailed;
-        } catch (IOException e) {
-            YahooWeatherLog.printStack(e);
-            mErrorType = ErrorType.ConnectionFailed;
-        } finally {
-            httpClient.getConnectionManager().shutdown();
+            catch (Exception e) {
+                throw new Exception(e);
+            }
+            urlConnection.disconnect();
+        }
+		catch (Exception e) {
+            qResult = "";
         }
 
         return qResult;
