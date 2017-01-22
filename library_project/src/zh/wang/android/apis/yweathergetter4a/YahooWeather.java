@@ -268,33 +268,60 @@ public class YahooWeather implements LocationResult {
         builder.scheme("https");
         builder.authority(YQL_WEATHER_ENDPOINT_AUTHORITY);
         builder.path(YQL_WEATHER_ENDPOINT_PATH);
-        builder.appendQueryParameter("q", "select * from weather.forecast where woeid in" +
-                        "(select woeid from geo.places(1) where text=\"" +
+        builder.appendQueryParameter("q", "select * from weather.forecast where woeid in " +
+                        "(select woeid from geo.places where text=\"" +
                         placeName +
                         "\")");
         String queryUrl = builder.build().toString();
 
         YahooWeatherLog.d("query url : " + queryUrl);
 
-        HttpClient httpClient = NetworkUtils.createHttpClient();
-
-        HttpGet httpGet = new HttpGet(queryUrl);
-
         try {
             URL url = new URL(queryUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.connect();
+            switch (urlConnection.getResponseCode()) {
+                case HttpURLConnection.HTTP_BAD_GATEWAY:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_BAD_GATEWAY");
+                case HttpURLConnection.HTTP_BAD_METHOD:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_BAD_METHOD");
+                case HttpURLConnection.HTTP_BAD_REQUEST:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_BAD_REQUEST");
+                case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_CLIENT_TIMEOUT");
+                case HttpURLConnection.HTTP_CONFLICT:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_CONFLICT");
+                case HttpURLConnection.HTTP_ENTITY_TOO_LARGE:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_ENTITY_TOO_LARGE");
+                case HttpURLConnection.HTTP_FORBIDDEN:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_FORBIDDEN");
+				case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
+					mErrorType = ErrorType.ConnectionFailed;
+					throw new Exception("HTTP_GATEWAY_TIMEOUT");
+				case HttpURLConnection.HTTP_UNAVAILABLE:
+					mErrorType = ErrorType.ConnectionFailed;
+					throw new Exception("HTTP_UNAVAILABLE");
+                default:
+                    break;
+            }
             InputStream content = new BufferedInputStream(urlConnection.getInputStream());
             BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
             String currLine = "";
             try {
-            while ((currLine = buffer.readLine()) != null) {
+                while ((currLine = buffer.readLine()) != null) {
                     qResult += currLine;
                 }
             }
-            catch (Exception e) {
-                throw new Exception(e);
+            finally {
+                urlConnection.disconnect();
             }
-            urlConnection.disconnect();
         }
 		catch (Exception e) {
             qResult = "";
