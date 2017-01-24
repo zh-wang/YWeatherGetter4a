@@ -4,17 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-
 public class NetworkUtils {
-    
-    /** default timeout is 20 seconds */
-    private int mConnectTimeout = 20 * 1000;
-    private int mSocketTimeout = 20 * 1000;
     
     private static NetworkUtils sInstance = new NetworkUtils();
     
@@ -30,20 +20,4 @@ public class NetworkUtils {
 
 		return (networkInfo != null && networkInfo.isConnected());
 	}
-	
-	public static HttpClient createHttpClient() {
-		HttpParams params = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(params, getInstance().mConnectTimeout);
-		HttpConnectionParams.setSoTimeout(params, getInstance().mSocketTimeout);
-		HttpClient httpClient = new DefaultHttpClient(params);
-	    return httpClient;
-	}
-
-    public void setConnectTimeout(int connectTimeout) {
-        mConnectTimeout = connectTimeout;
-    }
-
-    public void setSocketTimeout(int socketTimeout) {
-        mSocketTimeout = socketTimeout;
-    }
 }
