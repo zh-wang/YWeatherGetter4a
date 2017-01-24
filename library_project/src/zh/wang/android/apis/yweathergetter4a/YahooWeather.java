@@ -69,7 +69,8 @@ public class YahooWeather implements LocationResult {
 
 	public enum SEARCH_MODE {
 		GPS,
-		PLACE_NAME
+		PLACE_NAME,
+		WOEID
 	}
 	
 	public enum UNIT {
@@ -181,7 +182,29 @@ public class YahooWeather implements LocationResult {
 		final WeatherQueryByPlaceTask task = new WeatherQueryByPlaceTask();
 		task.execute(new String[] {convertedlocation});
 	}
-	
+
+	/**
+	 * Use known WOEID to query Yahoo weather apis for weather information. 
+	 * Querying will be run on a separated thread to accessing Yahoo's apis.
+	 * When it is completed, a callback will be fired.
+	 * See {@link YahooWeatherInfoListener} for detail.
+	 * @param context app's context
+	 * @param woeid WOEID;
+	 * @param result A {@link WeatherInfo} instance.
+	 */
+	public void queryYahooWeatherByWOEID(final Context context, final String woeid, 
+			final YahooWeatherInfoListener result) {
+		YahooWeatherLog.d("query yahoo weather by WOEID");
+		mContext = context;
+        if (!NetworkUtils.isConnected(context)) {
+            mErrorType = ErrorType.ConnectionFailed;
+        	return;
+        }
+		mWeatherInfoResult = result;
+		final WeatherQueryByWOEIDTask task = new WeatherQueryByWOEIDTask();
+		task.execute(new String[] {woeid});
+	}
+
 	/** 
 	 * Use lat & lon pair to query Yahoo weather apis for weather information.
 	 * Querying will be run on a separated thread to accessing Yahoo's apis.
@@ -330,6 +353,74 @@ public class YahooWeather implements LocationResult {
         return qResult;
     }
 
+    private String getWeatherStringByWOEID(Context context, String woeid) {
+        YahooWeatherLog.d("query yahoo weather with WOEID : " + woeid);
+
+        String qResult = "";
+
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("https");
+        builder.authority(YQL_WEATHER_ENDPOINT_AUTHORITY);
+        builder.path(YQL_WEATHER_ENDPOINT_PATH);
+        builder.appendQueryParameter("q", "select * from weather.forecast where woeid=" + woeid);
+        String queryUrl = builder.build().toString();
+
+        YahooWeatherLog.d("query url : " + queryUrl);
+
+        try {
+            URL url = new URL(queryUrl);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.connect();
+            switch (urlConnection.getResponseCode()) {
+                case HttpURLConnection.HTTP_BAD_GATEWAY:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_BAD_GATEWAY");
+                case HttpURLConnection.HTTP_BAD_METHOD:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_BAD_METHOD");
+                case HttpURLConnection.HTTP_BAD_REQUEST:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_BAD_REQUEST");
+                case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_CLIENT_TIMEOUT");
+                case HttpURLConnection.HTTP_CONFLICT:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_CONFLICT");
+                case HttpURLConnection.HTTP_ENTITY_TOO_LARGE:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_ENTITY_TOO_LARGE");
+                case HttpURLConnection.HTTP_FORBIDDEN:
+                    mErrorType = ErrorType.ConnectionFailed;
+                    throw new Exception("HTTP_FORBIDDEN");
+				case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
+					mErrorType = ErrorType.ConnectionFailed;
+					throw new Exception("HTTP_GATEWAY_TIMEOUT");
+				case HttpURLConnection.HTTP_UNAVAILABLE:
+					mErrorType = ErrorType.ConnectionFailed;
+					throw new Exception("HTTP_UNAVAILABLE");
+                default:
+                    break;
+            }
+            InputStream content = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
+            String currLine = "";
+            try {
+                while ((currLine = buffer.readLine()) != null) {
+                    qResult += currLine;
+                }
+            }
+            finally {
+                urlConnection.disconnect();
+            }
+        }
+		catch (Exception e) {
+            qResult = "";
+        }
+
+        return qResult;
+    }
+
 	private Document convertStringToDocument(Context context, String src) {
 		if (src.length() == 0) return null;
 
@@ -403,7 +494,7 @@ public class YahooWeather implements LocationResult {
 			weatherInfo.setCurrentText(
 					currentConditionNode.getAttributes().getNamedItem("text").getNodeValue());
 			int curTempF = Integer.parseInt(currentConditionNode.getAttributes().getNamedItem("temp").getNodeValue());
-            int curTempC = YahooWeather.turnFtoC(curTempF);
+			int curTempC = YahooWeather.turnFtoC(curTempF);
 			weatherInfo.setCurrentTemp(mUnit == UNIT.CELSIUS ? curTempC : curTempF);
 			weatherInfo.setCurrentConditionDate(
 					currentConditionNode.getAttributes().getNamedItem("date").getNodeValue());
@@ -457,6 +548,27 @@ public class YahooWeather implements LocationResult {
                         + "No place name exists.");
 			}
             String weatherString = getWeatherString(mContext, placeName[0]);
+            Document weatherDoc = convertStringToDocument(mContext, weatherString);
+            WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
+            return weatherInfo;
+		}
+
+		@Override
+		protected void onPostExecute(WeatherInfo result) {
+			super.onPostExecute(result);
+			mWeatherInfoResult.gotWeatherInfo(result, mErrorType);
+			mContext = null;
+		}
+	}
+
+	private class WeatherQueryByWOEIDTask extends AsyncTask<String, Void, WeatherInfo> {
+		@Override
+		protected WeatherInfo doInBackground(String... woeid) {
+			if (woeid == null || woeid.length > 1) {
+				throw new IllegalArgumentException("Parameter of WeatherQueryByWOEIDTask is illegal. "
+                        + "No WOEID.");
+			}
+            String weatherString = getWeatherStringByWOEID(mContext, woeid[0]);
             Document weatherDoc = convertStringToDocument(mContext, weatherString);
             WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
             return weatherInfo;
