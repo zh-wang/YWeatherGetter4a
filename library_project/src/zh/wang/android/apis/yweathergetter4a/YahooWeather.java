@@ -269,7 +269,7 @@ public class YahooWeather implements LocationResult {
         builder.authority(YQL_WEATHER_ENDPOINT_AUTHORITY);
         builder.path(YQL_WEATHER_ENDPOINT_PATH);
         builder.appendQueryParameter("q", "select * from weather.forecast where woeid in " +
-                        "(select woeid from geo.places where text=\"" +
+                        "(select woeid from geo.places(1) where text=\"" +
                         placeName +
                         "\")");
         String queryUrl = builder.build().toString();
