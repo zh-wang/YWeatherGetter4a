@@ -34,9 +34,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.List;
 
@@ -57,15 +55,14 @@ public class YahooWeather implements LocationResult {
         ConnectionFailed,
         NoLocationFound,
         ParsingFailed,
+        UnKnown,
     }
 
     ErrorType mErrorType = null;
 
-    private static final String YQL_WEATHER_ENDPOINT_AUTHORITY = "query.yahooapis.com";
-    private static final String YQL_WEATHER_ENDPOINT_PATH = "/v1/public/yql";
-
-    private static final int CONNECT_TIMEOUT_DEFAULT = 20 * 1000;
-    private static final int SOCKET_TIMEOUT_DEFAULT = 20 * 1000;
+    public static final String YAHOO_WEATHER_ERROR = "Yahoo! Weather - Error";
+    public static final int FORECAST_INFO_MAX_SIZE = 5;
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 5 * 1000;
 
 	public enum SEARCH_MODE {
 		GPS,
@@ -77,15 +74,14 @@ public class YahooWeather implements LocationResult {
 	    FAHRENHEIT,
 	    CELSIUS,
 	}
-	
-	public static final String YAHOO_WEATHER_ERROR = "Yahoo! Weather - Error";
 
-	public static final int FORECAST_INFO_MAX_SIZE = 5;
-	
-	private String mWoeidNumber;
+    private static final String YQL_WEATHER_ENDPOINT_AUTHORITY = "query.yahooapis.com";
+    private static final String YQL_WEATHER_ENDPOINT_PATH = "/v1/public/yql";
+
 	private YahooWeatherInfoListener mWeatherInfoResult;
 	private boolean mNeedDownloadIcons;
 	private SEARCH_MODE mSearchMode;
+    private int mConnectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
 	// Use Metric units by default
 	private UNIT mUnit = UNIT.CELSIUS;
@@ -96,6 +92,8 @@ public class YahooWeather implements LocationResult {
 	public SEARCH_MODE getSearchMode() {
 		return mSearchMode;
 	}
+
+    // ==== Getter Setter ====
 
 	public void setSearchMode(SEARCH_MODE searchMode) {
 		mSearchMode = searchMode;
@@ -115,13 +113,15 @@ public class YahooWeather implements LocationResult {
 		return mUnit;
 	}
 
+    // ==== Instance ====
+
 	/**
 	 * Get the YahooWeather instance.
 	 * Use this to query weather information from Yahoo.
 	 * @return YahooWeather instance
 	 */
 	public static YahooWeather getInstance() {
-	    getInstance(CONNECT_TIMEOUT_DEFAULT, SOCKET_TIMEOUT_DEFAULT);
+        getInstance(DEFAULT_CONNECTION_TIMEOUT);
 		return mInstance;
 	}
 	
@@ -129,22 +129,21 @@ public class YahooWeather implements LocationResult {
 	 * Get the YahooWeather instance.
 	 * Use this to query weather information from Yahoo.
 	 * @param connectTimeout in milliseconds, 5 seconds in default
-	 * @param socketTimeout in milliseconds, 5 seconds in default
 	 * @return YahooWeather instance
 	 */
-	public static YahooWeather getInstance(int connectTimeout, int socketTimeout) {
-	    return getInstance(connectTimeout, socketTimeout, false);
+	public static YahooWeather getInstance(int connectTimeout) {
+	    return getInstance(connectTimeout, false);
 	}
 	
 	/**
 	 * Get the YahooWeather instance.
 	 * Use this to query weather information from Yahoo.
 	 * @param connectTimeout in milliseconds, 5 seconds in default
-	 * @param socketTimeout in milliseconds, 5 seconds in default
 	 * @param isDebuggable set if you want some debug log in Logcat
 	 * @return YahooWeather instance
 	 */
-	public static YahooWeather getInstance(int connectTimeout, int socketTimeout, boolean isDebuggable) {
+	public static YahooWeather getInstance(int connectTimeout, boolean isDebuggable) {
+        mInstance.mConnectionTimeout = connectTimeout;
 	    YahooWeatherLog.setDebuggable(isDebuggable);
 		return mInstance;
 	}
@@ -302,6 +301,7 @@ public class YahooWeather implements LocationResult {
         try {
             URL url = new URL(queryUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(mConnectionTimeout);
             urlConnection.connect();
             switch (urlConnection.getResponseCode()) {
                 case HttpURLConnection.HTTP_BAD_GATEWAY:
@@ -556,6 +556,7 @@ public class YahooWeather implements LocationResult {
 		@Override
 		protected void onPostExecute(WeatherInfo result) {
 			super.onPostExecute(result);
+            if (result == null && mErrorType == null) mErrorType = ErrorType.UnKnown;
 			mWeatherInfoResult.gotWeatherInfo(result, mErrorType);
 			mContext = null;
 		}
@@ -577,6 +578,7 @@ public class YahooWeather implements LocationResult {
 		@Override
 		protected void onPostExecute(WeatherInfo result) {
 			super.onPostExecute(result);
+            if (result == null && mErrorType == null) mErrorType = ErrorType.UnKnown;
 			mWeatherInfoResult.gotWeatherInfo(result, mErrorType);
 			mContext = null;
 		}
@@ -617,8 +619,7 @@ public class YahooWeather implements LocationResult {
                         String weatherString = getWeatherString(mContext, addressToPlaceName(address));
                         Document weatherDoc = convertStringToDocument(mContext, weatherString);
                         WeatherInfo weatherInfo = parseWeatherInfo(mContext, weatherDoc);
-                        if(weatherInfo != null)
-                        	weatherInfo.setAddress(address);
+                        if(weatherInfo != null) weatherInfo.setAddress(address);
                         return weatherInfo;
                     }
 
@@ -632,6 +633,7 @@ public class YahooWeather implements LocationResult {
 		@Override
 		protected void onPostExecute(WeatherInfo result) {
 			super.onPostExecute(result);
+            if (result == null && mErrorType == null) mErrorType = ErrorType.UnKnown;
 			mWeatherInfoResult.gotWeatherInfo(result, mErrorType);
 			mContext = null;
 		}

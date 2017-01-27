@@ -26,7 +26,7 @@ class AsciiUtils {
     // private constructor, can't be instanciated!
     private AsciiUtils() { }
 
-    // remove accentued from a string and replace with ascii equivalent
+    // remove accented from a string and replace with ascii equivalent
     public static String convertNonAscii(String s) {
        if (s == null) return null;
        StringBuilder sb = new StringBuilder();

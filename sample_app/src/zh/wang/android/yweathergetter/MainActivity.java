@@ -49,7 +49,7 @@ public class MainActivity extends Activity implements YahooWeatherInfoListener {
 	private LinearLayout mCurrentWeatherInfoLayout;
 	private LinearLayout mWeatherInfosLayout;
 
-	private YahooWeather mYahooWeather = YahooWeather.getInstance(5000, 5000, true);
+	private YahooWeather mYahooWeather = YahooWeather.getInstance(5000, true);
 
     private ProgressDialog mProgressDialog;
 	
