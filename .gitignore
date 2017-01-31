@@ -1,4 +1,4 @@
-# built application files
+#built application files
 *.apk
 *.ap_
 
@@ -12,31 +12,34 @@
 bin/
 gen/
 
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# Release Files #
-release/
-
-# ant builder #
-build.xml
+# Local configuration file (sdk path, etc)
 local.properties
 
-# DS file
+# Windows thumbnail db
+Thumbs.db
+
+# OSX files
 .DS_Store
 
+# Eclipse project files
 .classpath
 .project
-proguard/
+
+# Android Studio
+.idea
 *.iml
-*.ipr
-*.iws
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/libraries/
-.idea/vcs.xml
+.idea/
 .gradle
-app/build/
-.DS_Store
+build/
+*.jar
+# Android Studio Navigation editor temp files
+.navigation/
+
+# For older project, need the following
+/*/out
+/*/*/build
+/*/*/production
+*.iws
+*.ipr
+*~
+*.swp
