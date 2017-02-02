@@ -23,9 +23,9 @@ For more information, check Yahoo's document here.
 
   `compile 'zh.wang.android:yweathergetter4a:1.3.0'`
 
-+ How to use
++ How to use ([Sample Activity](https://github.com/zh-wang/YWeatherGetter4a/blob/master/app/src/main/java/zh/wang/android/yweathergetter4a_demo/MainActivity.java))
 
-   * First, implement YahooWeatherInfoListener in your Activity. Basicly, `INTERNET` and `ACCESS_NETWORK_STATE` permissions are required.
+   * Implement `YahooWeatherInfoListener` in your Activity. `INTERNET` and `ACCESS_NETWORK_STATE` permissions are required.
 
         ```java
         @Override
@@ -36,6 +36,12 @@ For more information, check Yahoo's document here.
                 // if `weatherInfo` is null, you can get the error from `errorType`
             }
         }
+        ```
+
+  * Get a instance of `YahooWeather` class.
+
+        ```java
+        YahooWeather mYahooWeather = YahooWeather.getInstance();
         ```
 
   * Query by place's name. You can replace `cityAreaOrLocation` to what you want. For example, "Tokyo Japan", "Acaraù Brazil", "Shanghai China", etc.
