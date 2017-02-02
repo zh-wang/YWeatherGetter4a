@@ -1,4 +1,5 @@
 language: android
+jdk: oraclejdk8
 script:
     - gradle build connectedCheck
 # Emulator Management: Create, Start and Wait
