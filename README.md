@@ -1,7 +1,11 @@
 YWeatherGetter4a
 ================
 
-<span style="color:red">__Note that [YQL service is retired](https://developer.yahoo.com/yql/?guccounter=1), so this lib dont work anymore :(__</span>
+--------------
+
+__Note that [YQL service is retired](https://developer.yahoo.com/yql/?guccounter=1), so this lib don't work anymore :(__
+
+--------------
 
 An Yahoo Weather API wrapper for android
 
