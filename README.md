@@ -1,5 +1,7 @@
-YWeatherGetter4a [![Build Status](https://travis-ci.org/zh-wang/YWeatherGetter4a.svg?branch=master)](https://travis-ci.org/zh-wang/YWeatherGetter4a)
+YWeatherGetter4a
 ================
+
+<span style="color:red">__Note that [YQL service is retired](https://developer.yahoo.com/yql/?guccounter=1), so this lib dont work anymore :(__</span>
 
 An Yahoo Weather API wrapper for android
 
